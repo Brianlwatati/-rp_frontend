@@ -89,7 +89,10 @@ export interface Product {
 
 export interface StockLevel {
   productId: number;
+  sku: string;
+  productName: string;
   warehouseId: number;
+  warehouseName: string;
   quantity: string;
   reservedQuantity: string;
   averageCost: string;
@@ -107,7 +110,9 @@ export type StockMovementReason =
 export interface StockMovement {
   id: number;
   productId: number;
+  productName: string;
   warehouseId: number;
+  warehouseName: string;
   quantityDelta: string;
   unitCost: string | null;
   reason: StockMovementReason;
@@ -122,7 +127,11 @@ export interface StockTransfer {
   id: number;
   iasCompanyId: number;
   productId: number;
+  productName: string;
+  productSku: string;
   fromWarehouseId: number;
+  fromWarehouseName: string;
+  toWarehouseName: string;
   toWarehouseId: number;
   quantity: string;
   status: "COMPLETED" | "PENDING";

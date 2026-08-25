@@ -16,8 +16,12 @@ const FALLBACK_TRANSFERS: StockTransfer[] = [
     id: 1,
     iasCompanyId: 2,
     productId: 1,
+    productName: "Steel Shelving Unit",
+    productSku: "SSU-001",
     fromWarehouseId: 1,
+    fromWarehouseName: "Main Warehouse",
     toWarehouseId: 2,
+    toWarehouseName: "Secondary Warehouse",
     quantity: "10",
     status: "COMPLETED",
     createdBy: 1,
@@ -27,8 +31,12 @@ const FALLBACK_TRANSFERS: StockTransfer[] = [
     id: 2,
     iasCompanyId: 2,
     productId: 2,
+    productName: "Aluminum Tray",
+    productSku: "AT-001",
     fromWarehouseId: 2,
+    fromWarehouseName: "Secondary Warehouse",
     toWarehouseId: 1,
+    toWarehouseName: "Main Warehouse",
     quantity: "4",
     status: "PENDING",
     createdBy: 2,
@@ -37,7 +45,6 @@ const FALLBACK_TRANSFERS: StockTransfer[] = [
 ];
 
 export default function StockTransfersPage() {
-  const { productLabel, warehouseLabel } = useInventoryLookups();
   const [transfers, setTransfers] =
     useState<StockTransfer[]>(FALLBACK_TRANSFERS);
 
@@ -56,9 +63,9 @@ export default function StockTransfersPage() {
           dateStyle: "medium",
         }),
     },
-    { header: "Product", accessor: (t) => productLabel(t.productId) },
-    { header: "From", accessor: (t) => warehouseLabel(t.fromWarehouseId) },
-    { header: "To", accessor: (t) => warehouseLabel(t.toWarehouseId) },
+    { header: "Product", accessor: (t) => `${t.productSku}- ${t.productName}` },
+    { header: "From", accessor: (t) => t.fromWarehouseName },
+    { header: "To", accessor: (t) => t.toWarehouseName },
     { header: "Quantity", accessor: (t) => t.quantity, align: "right" },
     {
       header: "Status",

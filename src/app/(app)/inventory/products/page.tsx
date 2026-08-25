@@ -181,7 +181,7 @@ export default function ProductsPage() {
         <DataTable
           columns={columns}
           rows={products}
-          rowKey={(p) => String(p.id)}
+          rowKey={(p) => String(p.id) + p.totalAvailable}
         />
       </div>
     </>

@@ -13,7 +13,10 @@ import type { StockLevel, StockValuationRow } from "@/lib/types";
 const FALLBACK_LEVELS: StockLevel[] = [
   {
     productId: 1,
+    sku: "SKU-2201",
+    productName: "Steel Shelving Unit",
     warehouseId: 1,
+    warehouseName: "Main Warehouse",
     quantity: "84",
     reservedQuantity: "10",
     averageCost: "41.50",
@@ -21,19 +24,14 @@ const FALLBACK_LEVELS: StockLevel[] = [
   },
   {
     productId: 2,
+    sku: "SKU-2202",
+    productName: "Pallet Wrap (Roll)",
     warehouseId: 1,
+    warehouseName: "Main Warehouse",
     quantity: "12",
     reservedQuantity: "0",
     averageCost: "5.50",
     updatedAt: "2026-08-11T00:00:00.000Z",
-  },
-  {
-    productId: 3,
-    warehouseId: 1,
-    quantity: "6",
-    reservedQuantity: "0",
-    averageCost: "120.00",
-    updatedAt: "2026-07-01T00:00:00.000Z",
   },
 ];
 
@@ -65,7 +63,6 @@ const FALLBACK_VALUATION: StockValuationRow[] = [
 ];
 
 export default function StockPage() {
-  const { productLabel, warehouseLabel } = useInventoryLookups();
   const [levels, setLevels] = useState<StockLevel[]>(FALLBACK_LEVELS);
   const [valuation, setValuation] =
     useState<StockValuationRow[]>(FALLBACK_VALUATION);
@@ -84,11 +81,9 @@ export default function StockPage() {
   const columns: Column<StockLevel>[] = [
     {
       header: "Product",
-      accessor: (s) => (
-        <span className="text-ink-100">{productLabel(s.productId)}</span>
-      ),
+      accessor: (s) => <span className="text-ink-100">{s.productName}</span>,
     },
-    { header: "Warehouse", accessor: (s) => warehouseLabel(s.warehouseId) },
+    { header: "Warehouse", accessor: (s) => s.warehouseName },
     { header: "Quantity", accessor: (s) => s.quantity, align: "right" },
     { header: "Reserved", accessor: (s) => s.reservedQuantity, align: "right" },
     {

@@ -15,7 +15,9 @@ const FALLBACK_MOVEMENTS: StockMovement[] = [
   {
     id: 1,
     productId: 1,
+    productName: "Steel Shelving Unit",
     warehouseId: 1,
+    warehouseName: "Main Warehouse",
     quantityDelta: "20",
     unitCost: "42.00",
     reason: "RECEIVE",
@@ -28,7 +30,9 @@ const FALLBACK_MOVEMENTS: StockMovement[] = [
   {
     id: 2,
     productId: 1,
+    productName: "Steel Shelving Unit",
     warehouseId: 1,
+    warehouseName: "Main Warehouse",
     quantityDelta: "-6",
     unitCost: null,
     reason: "SALE",
@@ -41,7 +45,9 @@ const FALLBACK_MOVEMENTS: StockMovement[] = [
   {
     id: 3,
     productId: 2,
+    productName: "Aluminum Tray",
     warehouseId: 1,
+    warehouseName: "Main Warehouse",
     quantityDelta: "-2",
     unitCost: null,
     reason: "ADJUSTMENT",
@@ -66,13 +72,12 @@ const REASON_TONE: Record<
 };
 
 export default function StockMovementsPage() {
-  const { productLabel, warehouseLabel } = useInventoryLookups();
   const [movements, setMovements] =
     useState<StockMovement[]>(FALLBACK_MOVEMENTS);
 
   useEffect(() => {
     api
-      .get<StockMovement[]>("/inventory/stock/valuation")
+      .get<StockMovement[]>("/inventory/stock/movements")
       .then(setMovements)
       .catch(() => setMovements(FALLBACK_MOVEMENTS));
   }, []);
@@ -85,18 +90,22 @@ export default function StockMovementsPage() {
           dateStyle: "medium",
         }),
     },
-    { header: "Product", accessor: (m) => productLabel(m.productId) },
-    { header: "Warehouse", accessor: (m) => warehouseLabel(m.warehouseId) },
+    { header: "Product", accessor: (m) => ` ${m.productName}` },
+    { header: "Warehouse", accessor: (m) => ` ${m.warehouseName}` },
     {
       header: "Reason",
-      accessor: (m) => <Badge tone={REASON_TONE[m.reason]}>{m.reason}</Badge>,
+      accessor: (m) => (
+        <Badge tone={m.reason ? REASON_TONE[m.reason] : "neutral"}>
+          {m.reason}
+        </Badge>
+      ),
     },
     {
       header: "Qty Δ",
       accessor: (m) => (
         <span
           className={
-            Number(m.quantityDelta) >= 0
+            m.quantityDelta && Number(m.quantityDelta) >= 0
               ? "text-signal-green font-mono"
               : "text-signal-red font-mono"
           }
