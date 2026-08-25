@@ -83,7 +83,9 @@ const FALLBACK_MOVEMENTS: StockMovement[] = [
   {
     id: 1,
     productId: 1,
+    productName: "Steel Shelving Unit",
     warehouseId: 1,
+    warehouseName: "Nairobi Central",
     quantityDelta: "20",
     unitCost: "42.00",
     reason: "RECEIVE",
@@ -228,7 +230,7 @@ export default function InventoryOverviewPage() {
               >
                 <div>
                   <p className="text-ink-100 font-mono text-xs">
-                    Product #{m.productId} · Warehouse #{m.warehouseId}
+                    {m.productName} · {m.warehouseName}
                   </p>
                   <p className="text-ink-500 text-xs mt-0.5">{m.reason}</p>
                 </div>
