@@ -25,31 +25,21 @@ const FALLBACK_WAREHOUSES: LookupItem[] = [
 // sample data (or "#id") if the ERP backend isn't reachable yet.
 export function useInventoryLookups() {
   const [products, setProducts] = useState<LookupItem[]>(FALLBACK_PRODUCTS);
-  const [warehouses, setWarehouses] =
-    useState<LookupItem[]>(FALLBACK_WAREHOUSES);
+  const [warehouses, setWarehouses] = useState<LookupItem[]>(FALLBACK_WAREHOUSES);
 
   useEffect(() => {
     api
-      .get<Array<{ id: number; sku: string; name: string }>>(
-        "/inventory/products",
-      )
-      .then((rows) =>
-        setProducts(
-          rows.map((p) => ({ id: p.id, label: `${p.sku} · ${p.name}` })),
-        ),
-      )
+      .get<Array<{ id: number; sku: string; name: string }>>("/inventory/products")
+      .then((rows) => setProducts(rows.map((p) => ({ id: p.id, label: `${p.sku} · ${p.name}` }))))
       .catch(() => setProducts(FALLBACK_PRODUCTS));
 
     api
       .get<Array<{ id: number; name: string }>>("/inventory/warehouses")
-      .then((rows) =>
-        setWarehouses(rows.map((w) => ({ id: w.id, label: w.name }))),
-      )
+      .then((rows) => setWarehouses(rows.map((w) => ({ id: w.id, label: w.name }))))
       .catch(() => setWarehouses(FALLBACK_WAREHOUSES));
   }, []);
 
-  const productLabel = (id: number) =>
-    products.find((p) => p.id === id)?.label ?? `Product #${id}`;
+  const productLabel = (id: number) => products.find((p) => p.id === id)?.label ?? `Product #${id}`;
   const warehouseLabel = (id: number) =>
     warehouses.find((w) => w.id === id)?.label ?? `Warehouse #${id}`;
 

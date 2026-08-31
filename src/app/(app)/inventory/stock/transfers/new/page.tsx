@@ -7,7 +7,7 @@ import { Topbar } from "@/components/layout/Topbar";
 import { InventoryTabs } from "@/components/inventory/InventoryTabs";
 import { Field, inputClass } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
-import { api } from "@/lib/api";
+import { api, describeApiError } from "@/lib/api";
 import { useInventoryLookups } from "@/lib/inventoryLookups";
 import type { StockTransfer } from "@/lib/types";
 
@@ -22,12 +22,10 @@ export default function NewStockTransferPage() {
     fromWarehouseId: "",
     toWarehouseId: "",
     quantity: "",
+    notes: "",
   });
 
-  function update<K extends keyof typeof form>(
-    key: K,
-    value: (typeof form)[K],
-  ) {
+  function update<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
     setForm((f) => ({ ...f, [key]: value }));
   }
 
@@ -47,14 +45,11 @@ export default function NewStockTransferPage() {
         fromWarehouseId: Number(form.fromWarehouseId),
         toWarehouseId: Number(form.toWarehouseId),
         quantity: Number(form.quantity),
+        notes: form.notes || undefined,
       });
       router.push("/inventory/stock/transfers");
     } catch (err) {
-      const message =
-        err && typeof err === "object" && "message" in err
-          ? String((err as { message: unknown }).message)
-          : "Couldn't create this transfer. Check the fields and try again.";
-      setError(message);
+      setError(describeApiError(err, "Couldn't create this transfer. Check the fields and try again."));
     } finally {
       setSubmitting(false);
     }
@@ -62,10 +57,7 @@ export default function NewStockTransferPage() {
 
   return (
     <>
-      <Topbar
-        title="New transfer"
-        description="Move quantity from one warehouse to another."
-      />
+      <Topbar title="New transfer" description="Move quantity from one warehouse to another." />
       <InventoryTabs />
 
       <div className="flex-1 overflow-y-auto p-4 sm:p-6">
@@ -129,11 +121,22 @@ export default function NewStockTransferPage() {
           <Field label="Quantity" required>
             <input
               required
-              inputMode="decimal"
+              type="number"
+              min="0.01"
+              step="any"
               value={form.quantity}
               onChange={(e) => update("quantity", e.target.value)}
               placeholder="10"
               className={`${inputClass} font-mono`}
+            />
+          </Field>
+
+          <Field label="Notes">
+            <textarea
+              value={form.notes}
+              onChange={(e) => update("notes", e.target.value)}
+              rows={2}
+              className={inputClass}
             />
           </Field>
 

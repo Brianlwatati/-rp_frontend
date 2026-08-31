@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Plus, Pencil, Warehouse as WarehouseIcon } from "lucide-react";
+import { Plus, Warehouse as WarehouseIcon } from "lucide-react";
 import { Topbar } from "@/components/layout/Topbar";
 import { InventoryTabs } from "@/components/inventory/InventoryTabs";
 import { DataTable, Column } from "@/components/ui/DataTable";
@@ -31,21 +31,10 @@ const FALLBACK_WAREHOUSES: Warehouse[] = [
     createdAt: "2026-02-14T00:00:00.000Z",
     updatedAt: "2026-02-14T00:00:00.000Z",
   },
-  {
-    id: 3,
-    iasCompanyId: 2,
-    code: "WH-OLD",
-    name: "Legacy Depot",
-    location: null,
-    status: "INACTIVE",
-    createdAt: "2024-03-01T00:00:00.000Z",
-    updatedAt: "2025-09-01T00:00:00.000Z",
-  },
 ];
 
 export default function WarehousesPage() {
-  const [warehouses, setWarehouses] =
-    useState<Warehouse[]>(FALLBACK_WAREHOUSES);
+  const [warehouses, setWarehouses] = useState<Warehouse[]>(FALLBACK_WAREHOUSES);
 
   useEffect(() => {
     api
@@ -64,58 +53,33 @@ export default function WarehousesPage() {
         </span>
       ),
     },
-    {
-      header: "Code",
-      accessor: (w) => <span className="font-mono text-xs">{w.code}</span>,
-    },
+    { header: "Code", accessor: (w) => <span className="font-mono text-xs">{w.code}</span> },
     { header: "Location", accessor: (w) => w.location ?? "—" },
     {
       header: "Status",
-      accessor: (w) => (
-        <Badge tone={w.status === "ACTIVE" ? "green" : "neutral"}>
-          {w.status}
-        </Badge>
-      ),
-    },
-    {
-      header: "",
-      accessor: (w) => (
-        <Link
-          href={`/inventory/warehouses/${w.id}/edit`}
-          className="inline-flex items-center gap-1.5 text-signal-cyan hover:text-signal-cyan/80 text-xs"
-        >
-          <Pencil size={13} />
-          Edit
-        </Link>
-      ),
-      align: "right",
-      width: "80px",
+      accessor: (w) => <Badge tone={w.status === "ACTIVE" ? "green" : "neutral"}>{w.status}</Badge>,
     },
   ];
 
   return (
     <>
-      <Topbar
-        title="Warehouses"
-        description="Locations stock is received into and held at."
-      />
+      <Topbar title="Warehouses" description="Locations stock is received into and held at." />
       <InventoryTabs />
 
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
-        <div className="flex justify-end">
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-xs text-ink-500">
+            Warehouses can be created here, but aren&apos;t editable after creation.
+          </p>
           <Link
             href="/inventory/warehouses/new"
-            className="inline-flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium bg-signal-cyan text-base-950 hover:bg-signal-cyan/90 transition-colors"
+            className="inline-flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium bg-signal-cyan text-base-950 hover:bg-signal-cyan/90 transition-colors shrink-0"
           >
             <Plus size={15} />
             New warehouse
           </Link>
         </div>
-        <DataTable
-          columns={columns}
-          rows={warehouses}
-          rowKey={(w) => String(w.id)}
-        />
+        <DataTable columns={columns} rows={warehouses} rowKey={(w) => String(w.id)} />
       </div>
     </>
   );

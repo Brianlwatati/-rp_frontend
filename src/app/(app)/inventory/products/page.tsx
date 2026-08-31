@@ -2,15 +2,15 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Plus, Pencil } from "lucide-react";
+import { Plus, Pencil, Archive } from "lucide-react";
 import { Topbar } from "@/components/layout/Topbar";
 import { InventoryTabs } from "@/components/inventory/InventoryTabs";
 import { DataTable, Column } from "@/components/ui/DataTable";
 import { Badge } from "@/components/ui/Badge";
-import { api } from "@/lib/api";
-import type { ProductWithStock } from "@/lib/types";
+import { api, describeApiError } from "@/lib/api";
+import type { Product } from "@/lib/types";
 
-const FALLBACK_PRODUCTS: ProductWithStock[] = [
+const FALLBACK_PRODUCTS: Product[] = [
   {
     id: 1,
     iasCompanyId: 2,
@@ -22,19 +22,10 @@ const FALLBACK_PRODUCTS: ProductWithStock[] = [
     costPrice: "42.00",
     sellPrice: "62.00",
     reorderLevel: "20",
+    totalAvailable: "74",
     status: "ACTIVE",
     createdAt: "2026-06-01T00:00:00.000Z",
     updatedAt: "2026-08-10T00:00:00.000Z",
-    stockByWarehouse: [
-      {
-        warehouseId: 1,
-        quantity: "84",
-        reservedQuantity: "10",
-        availableQuantity: "74",
-      },
-    ],
-    totalQuantity: "84",
-    totalAvailable: "74",
   },
   {
     id: 2,
@@ -47,19 +38,10 @@ const FALLBACK_PRODUCTS: ProductWithStock[] = [
     costPrice: "5.50",
     sellPrice: "8.00",
     reorderLevel: "25",
+    totalAvailable: "12",
     status: "ACTIVE",
     createdAt: "2026-06-01T00:00:00.000Z",
     updatedAt: "2026-08-11T00:00:00.000Z",
-    stockByWarehouse: [
-      {
-        warehouseId: 1,
-        quantity: "12",
-        reservedQuantity: "0",
-        availableQuantity: "12",
-      },
-    ],
-    totalQuantity: "12",
-    totalAvailable: "12",
   },
   {
     id: 3,
@@ -72,38 +54,38 @@ const FALLBACK_PRODUCTS: ProductWithStock[] = [
     costPrice: "120.00",
     sellPrice: "145.00",
     reorderLevel: "10",
+    totalAvailable: "6",
     status: "ARCHIVED",
     createdAt: "2025-11-01T00:00:00.000Z",
     updatedAt: "2026-07-01T00:00:00.000Z",
-    stockByWarehouse: [
-      {
-        warehouseId: 1,
-        quantity: "6",
-        reservedQuantity: "0",
-        availableQuantity: "6",
-      },
-    ],
-    totalQuantity: "6",
-    totalAvailable: "6",
   },
 ];
 
 export default function ProductsPage() {
-  const [products, setProducts] =
-    useState<ProductWithStock[]>(FALLBACK_PRODUCTS);
+  const [products, setProducts] = useState<Product[]>(FALLBACK_PRODUCTS);
+  const [actionError, setActionError] = useState<string | null>(null);
 
-  useEffect(() => {
+  function load() {
     api
-      .get<ProductWithStock[]>("/inventory/products")
+      .get<Product[]>("/inventory/products")
       .then(setProducts)
       .catch(() => setProducts(FALLBACK_PRODUCTS));
-  }, []);
+  }
 
-  const columns: Column<ProductWithStock>[] = [
-    {
-      header: "SKU",
-      accessor: (p) => <span className="font-mono text-xs">{p.sku}</span>,
-    },
+  useEffect(load, []);
+
+  async function archive(id: number) {
+    setActionError(null);
+    try {
+      await api.post(`/inventory/products/${id}/archive`);
+      load();
+    } catch (err) {
+      setActionError(describeApiError(err, "Couldn't archive this product."));
+    }
+  }
+
+  const columns: Column<Product>[] = [
+    { header: "SKU", accessor: (p) => <span className="font-mono text-xs">{p.sku}</span> },
     {
       header: "Product",
       accessor: (p) => (
@@ -114,61 +96,60 @@ export default function ProductsPage() {
       ),
     },
     { header: "Unit", accessor: (p) => p.unit },
-    {
-      header: "Cost",
-      accessor: (p) => `$${Number(p.costPrice).toFixed(2)}`,
-      align: "right",
-    },
-    {
-      header: "Sell",
-      accessor: (p) => `$${Number(p.sellPrice).toFixed(2)}`,
-      align: "right",
-    },
+    { header: "Cost", accessor: (p) => `$${Number(p.costPrice).toFixed(2)}`, align: "right" },
+    { header: "Sell", accessor: (p) => `$${Number(p.sellPrice).toFixed(2)}`, align: "right" },
     {
       header: "Available",
       accessor: (p) => (
         <span className="flex items-center justify-end gap-2">
           {p.totalAvailable}
-          {Number(p.totalAvailable) <= Number(p.reorderLevel) && (
-            <Badge tone="red">Reorder</Badge>
-          )}
+          {Number(p.totalAvailable) <= Number(p.reorderLevel) && <Badge tone="red">Reorder</Badge>}
         </span>
       ),
       align: "right",
     },
     {
       header: "Status",
-      accessor: (p) => (
-        <Badge tone={p.status === "ACTIVE" ? "green" : "neutral"}>
-          {p.status}
-        </Badge>
-      ),
+      accessor: (p) => <Badge tone={p.status === "ACTIVE" ? "green" : "neutral"}>{p.status}</Badge>,
     },
     {
       header: "",
       accessor: (p) => (
-        <Link
-          href={`/inventory/products/${p.id}/edit`}
-          className="inline-flex items-center gap-1.5 text-signal-cyan hover:text-signal-cyan/80 text-xs"
-        >
-          <Pencil size={13} />
-          Edit
-        </Link>
+        <div className="flex items-center justify-end gap-3">
+          {p.status === "ACTIVE" && (
+            <button
+              onClick={() => archive(p.id)}
+              className="inline-flex items-center gap-1.5 text-ink-500 hover:text-signal-red text-xs transition-colors"
+            >
+              <Archive size={13} />
+              Archive
+            </button>
+          )}
+          <Link
+            href={`/inventory/products/${p.id}/edit`}
+            className="inline-flex items-center gap-1.5 text-signal-cyan hover:text-signal-cyan/80 text-xs"
+          >
+            <Pencil size={13} />
+            Edit
+          </Link>
+        </div>
       ),
       align: "right",
-      width: "80px",
+      width: "140px",
     },
   ];
 
   return (
     <>
-      <Topbar
-        title="Products"
-        description="Every SKU tracked across your warehouses."
-      />
+      <Topbar title="Products" description="Every SKU tracked across your warehouses." />
       <InventoryTabs />
 
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
+        {actionError && (
+          <p className="text-sm text-signal-red bg-signal-red/10 border border-signal-red/30 rounded-lg px-3 py-2">
+            {actionError}
+          </p>
+        )}
         <div className="flex justify-end">
           <Link
             href="/inventory/products/new"
@@ -178,11 +159,7 @@ export default function ProductsPage() {
             New product
           </Link>
         </div>
-        <DataTable
-          columns={columns}
-          rows={products}
-          rowKey={(p) => String(p.id) + p.totalAvailable}
-        />
+        <DataTable columns={columns} rows={products} rowKey={(p) => String(p.id)} />
       </div>
     </>
   );

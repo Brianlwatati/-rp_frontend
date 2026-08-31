@@ -7,18 +7,17 @@ import { Topbar } from "@/components/layout/Topbar";
 import { InventoryTabs } from "@/components/inventory/InventoryTabs";
 import { Field, inputClass } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
-import { api } from "@/lib/api";
-import type { Product, ProductStatus } from "@/lib/types";
+import { api, describeApiError } from "@/lib/api";
+import type { ProductWithStock, ProductStatus } from "@/lib/types";
 
 const EMPTY_FORM = {
-  sku: "",
   name: "",
   description: "",
   unit: "",
   category: "",
   costPrice: "",
   sellPrice: "",
-  reorderLevel: "0",
+  reorderLevel: "",
   status: "ACTIVE" as ProductStatus,
 };
 
@@ -26,6 +25,7 @@ export default function EditProductPage() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
 
+  const [sku, setSku] = useState("");
   const [form, setForm] = useState(EMPTY_FORM);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -34,10 +34,10 @@ export default function EditProductPage() {
 
   useEffect(() => {
     api
-      .get<Product>(`/inventory/products/${params.id}`)
+      .get<ProductWithStock>(`/inventory/products/${params.id}`)
       .then((product) => {
+        setSku(product.sku);
         setForm({
-          sku: product.sku,
           name: product.name,
           description: product.description ?? "",
           unit: product.unit,
@@ -48,18 +48,13 @@ export default function EditProductPage() {
           status: product.status,
         });
       })
-      .catch(() =>
-        setLoadError(
-          "Couldn't load this product from the ERP backend — edit and save to retry.",
-        ),
+      .catch((err) =>
+        setLoadError(describeApiError(err, "Couldn't load this product from the ERP backend."))
       )
       .finally(() => setLoading(false));
   }, [params.id]);
 
-  function update<K extends keyof typeof form>(
-    key: K,
-    value: (typeof form)[K],
-  ) {
+  function update<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
     setForm((f) => ({ ...f, [key]: value }));
   }
 
@@ -68,12 +63,12 @@ export default function EditProductPage() {
     setError(null);
     setSubmitting(true);
     try {
-      await api.put<Product>(`/inventory/products/${params.id}`, {
-        sku: form.sku,
+      // PATCH /inventory/products/:id — sku is immutable, so it's not sent.
+      await api.patch<ProductWithStock>(`/inventory/products/${params.id}`, {
         name: form.name,
-        description: form.description || null,
+        description: form.description || undefined,
         unit: form.unit,
-        category: form.category || null,
+        category: form.category || undefined,
         costPrice: Number(form.costPrice),
         sellPrice: Number(form.sellPrice),
         reorderLevel: Number(form.reorderLevel),
@@ -81,11 +76,7 @@ export default function EditProductPage() {
       });
       router.push("/inventory/products");
     } catch (err) {
-      const message =
-        err && typeof err === "object" && "message" in err
-          ? String((err as { message: unknown }).message)
-          : "Couldn't save these changes. Check the fields and try again.";
-      setError(message);
+      setError(describeApiError(err, "Couldn't save these changes. Check the fields and try again."));
     } finally {
       setSubmitting(false);
     }
@@ -93,7 +84,7 @@ export default function EditProductPage() {
 
   return (
     <>
-      <Topbar title="Edit product" description={`Product #${params.id}`} />
+      <Topbar title="Edit product" description={sku ? `SKU ${sku}` : `Product #${params.id}`} />
       <InventoryTabs />
 
       <div className="flex-1 overflow-y-auto p-4 sm:p-6">
@@ -108,17 +99,13 @@ export default function EditProductPage() {
             )}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <Field label="SKU" required>
-                <input
-                  required
-                  value={form.sku}
-                  onChange={(e) => update("sku", e.target.value)}
-                  className={`${inputClass} font-mono`}
-                />
+              <Field label="SKU" hint="SKUs can't be changed after creation.">
+                <input disabled value={sku} className={`${inputClass} font-mono`} />
               </Field>
               <Field label="Name" required>
                 <input
                   required
+                  minLength={2}
                   value={form.name}
                   onChange={(e) => update("name", e.target.value)}
                   className={inputClass}
@@ -157,7 +144,9 @@ export default function EditProductPage() {
               <Field label="Cost price" required>
                 <input
                   required
-                  inputMode="decimal"
+                  type="number"
+                  min="0"
+                  step="0.01"
                   value={form.costPrice}
                   onChange={(e) => update("costPrice", e.target.value)}
                   className={`${inputClass} font-mono`}
@@ -166,7 +155,9 @@ export default function EditProductPage() {
               <Field label="Sell price" required>
                 <input
                   required
-                  inputMode="decimal"
+                  type="number"
+                  min="0"
+                  step="0.01"
                   value={form.sellPrice}
                   onChange={(e) => update("sellPrice", e.target.value)}
                   className={`${inputClass} font-mono`}
@@ -175,7 +166,9 @@ export default function EditProductPage() {
               <Field label="Reorder level" required>
                 <input
                   required
-                  inputMode="numeric"
+                  type="number"
+                  min="0"
+                  step="1"
                   value={form.reorderLevel}
                   onChange={(e) => update("reorderLevel", e.target.value)}
                   className={`${inputClass} font-mono`}
@@ -186,9 +179,7 @@ export default function EditProductPage() {
             <Field label="Status">
               <select
                 value={form.status}
-                onChange={(e) =>
-                  update("status", e.target.value as ProductStatus)
-                }
+                onChange={(e) => update("status", e.target.value as ProductStatus)}
                 className={inputClass}
               >
                 <option value="ACTIVE">Active</option>

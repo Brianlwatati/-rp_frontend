@@ -2,7 +2,6 @@
 
 import {
   LayoutDashboard,
-  Users,
   ShieldCheck,
   Building2,
   Boxes,
@@ -12,7 +11,7 @@ import {
   LogOut,
   X,
 } from "lucide-react";
-import { TenantSwitcher } from "./TenantSwitcher";
+import { CompanyBadge } from "./CompanyBadge";
 import { NavItem } from "./NavItem";
 import { useAuth } from "@/context/AuthContext";
 import { useSidebar } from "@/context/SidebarContext";
@@ -20,14 +19,13 @@ import { useSidebar } from "@/context/SidebarContext";
 const PRIMARY_NAV = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/inventory", label: "Inventory", icon: Boxes },
-  { href: "/orders", label: "Orders", icon: ClipboardList },
-  { href: "/customers", label: "Customers", icon: Contact },
+  { href: "/sales", label: "Sales", icon: ClipboardList },
+  { href: "/contacts", label: "Contacts", icon: Contact },
 ];
 
 const ACCESS_NAV = [
-  { href: "/users", label: "Users", icon: Users },
   { href: "/roles", label: "Roles", icon: ShieldCheck },
-  { href: "/tenants", label: "Tenants", icon: Building2 },
+  { href: "/branches", label: "Branches", icon: Building2 },
 ];
 
 function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
@@ -36,7 +34,7 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
 
   return (
     <>
-      <TenantSwitcher />
+      <CompanyBadge />
 
       <nav className="mt-6 flex-1 space-y-6 overflow-y-auto">
         <div>

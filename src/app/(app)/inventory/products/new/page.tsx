@@ -7,8 +7,8 @@ import { Topbar } from "@/components/layout/Topbar";
 import { InventoryTabs } from "@/components/inventory/InventoryTabs";
 import { Field, inputClass } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
-import { api } from "@/lib/api";
-import type { Product, ProductStatus } from "@/lib/types";
+import { api, describeApiError } from "@/lib/api";
+import type { Product } from "@/lib/types";
 
 export default function NewProductPage() {
   const router = useRouter();
@@ -19,18 +19,14 @@ export default function NewProductPage() {
     sku: "",
     name: "",
     description: "",
-    unit: "",
+    unit: "pcs",
     category: "",
-    costPrice: "",
-    sellPrice: "",
+    costPrice: "0",
+    sellPrice: "0",
     reorderLevel: "0",
-    status: "ACTIVE" as ProductStatus,
   });
 
-  function update<K extends keyof typeof form>(
-    key: K,
-    value: (typeof form)[K],
-  ) {
+  function update<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
     setForm((f) => ({ ...f, [key]: value }));
   }
 
@@ -39,24 +35,22 @@ export default function NewProductPage() {
     setError(null);
     setSubmitting(true);
     try {
+      // POST /inventory/products — prices/levels are numbers on the wire,
+      // even though they come back as strings (NUMERIC → string via pg).
+      // No status field: new products always start ACTIVE server-side.
       await api.post<Product>("/inventory/products", {
         sku: form.sku,
         name: form.name,
-        description: form.description || null,
+        description: form.description || undefined,
         unit: form.unit,
-        category: form.category || null,
+        category: form.category || undefined,
         costPrice: Number(form.costPrice),
         sellPrice: Number(form.sellPrice),
         reorderLevel: Number(form.reorderLevel),
-        status: form.status,
       });
       router.push("/inventory/products");
     } catch (err) {
-      const message =
-        err && typeof err === "object" && "message" in err
-          ? String((err as { message: unknown }).message)
-          : "Couldn't create the product. Check the fields and try again.";
-      setError(message);
+      setError(describeApiError(err, "Couldn't create the product. Check the fields and try again."));
     } finally {
       setSubmitting(false);
     }
@@ -70,9 +64,10 @@ export default function NewProductPage() {
       <div className="flex-1 overflow-y-auto p-4 sm:p-6">
         <form onSubmit={onSubmit} className="max-w-2xl panel p-6 space-y-5">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            <Field label="SKU" required>
+            <Field label="SKU" required hint="Letters, numbers, - and _ only.">
               <input
                 required
+                pattern="[A-Za-z0-9_-]+"
                 value={form.sku}
                 onChange={(e) => update("sku", e.target.value)}
                 placeholder="SKU-2201"
@@ -82,6 +77,7 @@ export default function NewProductPage() {
             <Field label="Name" required>
               <input
                 required
+                minLength={2}
                 value={form.name}
                 onChange={(e) => update("name", e.target.value)}
                 placeholder="Steel Shelving Unit"
@@ -90,10 +86,7 @@ export default function NewProductPage() {
             </Field>
           </div>
 
-          <Field
-            label="Description"
-            hint="Optional — shown on the product detail view."
-          >
+          <Field label="Description" hint="Optional — shown on the product detail view.">
             <textarea
               value={form.description}
               onChange={(e) => update("description", e.target.value)}
@@ -103,12 +96,12 @@ export default function NewProductPage() {
           </Field>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            <Field label="Unit" required hint="e.g. unit, roll, kg">
+            <Field label="Unit" required hint="e.g. pcs, roll, kg">
               <input
                 required
                 value={form.unit}
                 onChange={(e) => update("unit", e.target.value)}
-                placeholder="unit"
+                placeholder="pcs"
                 className={inputClass}
               />
             </Field>
@@ -126,50 +119,37 @@ export default function NewProductPage() {
             <Field label="Cost price" required>
               <input
                 required
-                inputMode="decimal"
                 type="number"
+                min="0"
+                step="0.01"
                 value={form.costPrice}
                 onChange={(e) => update("costPrice", e.target.value)}
-                placeholder="42.00"
                 className={`${inputClass} font-mono`}
               />
             </Field>
             <Field label="Sell price" required>
               <input
                 required
-                inputMode="decimal"
                 type="number"
+                min="0"
+                step="0.01"
                 value={form.sellPrice}
                 onChange={(e) => update("sellPrice", e.target.value)}
-                placeholder="62.00"
                 className={`${inputClass} font-mono`}
               />
             </Field>
             <Field label="Reorder level" required>
               <input
                 required
-                inputMode="numeric"
                 type="number"
+                min="0"
+                step="1"
                 value={form.reorderLevel}
                 onChange={(e) => update("reorderLevel", e.target.value)}
-                placeholder="20"
                 className={`${inputClass} font-mono`}
               />
             </Field>
           </div>
-
-          <Field label="Status">
-            <select
-              value={form.status}
-              onChange={(e) =>
-                update("status", e.target.value as ProductStatus)
-              }
-              className={inputClass}
-            >
-              <option value="ACTIVE">Active</option>
-              <option value="ARCHIVED">Archived</option>
-            </select>
-          </Field>
 
           {error && (
             <p className="text-sm text-signal-red bg-signal-red/10 border border-signal-red/30 rounded-lg px-3 py-2">

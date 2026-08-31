@@ -4,10 +4,10 @@ import type { ApiError } from "./types";
 const AUTH_BASE_URL =
   process.env.NEXT_PUBLIC_AUTH_API_URL ?? "http://localhost:5000/api/v1";
 
-// The ERP backend owns every other resource (inventory, orders, customers,
-// users, roles, tenants, ...) and trusts the token the auth service issued.
-const ERP_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4100/api/v1";
+// The ERP backend (erp_backend) — everything else. It listens on 4100 by
+// default (see its .env, PORT=4100) and mounts every module under /api/v1,
+// same prefix as the auth service.
+const ERP_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4100/api/v1";
 
 export const TOKEN_COOKIE = "ias_token";
 const REFRESH_TOKEN_KEY = "ias_refresh_token";
@@ -42,13 +42,16 @@ export function clearToken() {
   document.cookie = `${TOKEN_COOKIE}=; path=/; max-age=0`;
 }
 
-// Both services respond with { success, message, data }. This unwraps that
-// envelope automatically so callers just get the payload; a raw JSON body
-// (no envelope) is passed through as-is for flexibility.
+// Both services respond with { success, message, data } — and on a 4xx,
+// { success: false, message, errors } where `errors` is a zod
+// `.flatten()` shape ({ formErrors, fieldErrors }) for 422s. This unwraps
+// the envelope automatically; a raw JSON body (no envelope) is passed
+// through as-is for flexibility.
 interface ApiEnvelope<T> {
   success: boolean;
   message?: string;
   data: T;
+  errors?: unknown;
 }
 
 function isEnvelope(json: unknown): json is ApiEnvelope<unknown> {
@@ -63,7 +66,7 @@ function isEnvelope(json: unknown): json is ApiEnvelope<unknown> {
 async function request<T>(
   baseUrl: string,
   path: string,
-  options: RequestInit = {},
+  options: RequestInit = {}
 ): Promise<T> {
   const token = getToken();
 
@@ -86,7 +89,8 @@ async function request<T>(
   if (!res.ok) {
     const message =
       json && isEnvelope(json) && json.message ? json.message : res.statusText;
-    const error: ApiError = { message, status: res.status };
+    const errors = json && isEnvelope(json) ? json.errors : undefined;
+    const error: ApiError = { message, status: res.status, errors };
     throw error;
   }
 
@@ -95,6 +99,7 @@ async function request<T>(
       const error: ApiError = {
         message: json.message ?? "Request failed",
         status: res.status,
+        errors: json.errors,
       };
       throw error;
     }
@@ -108,22 +113,12 @@ function createApiClient(baseUrl: string) {
   return {
     get: <T>(path: string) => request<T>(baseUrl, path, { method: "GET" }),
     post: <T>(path: string, body?: unknown) =>
-      request<T>(baseUrl, path, {
-        method: "POST",
-        body: body ? JSON.stringify(body) : undefined,
-      }),
+      request<T>(baseUrl, path, { method: "POST", body: body ? JSON.stringify(body) : undefined }),
     put: <T>(path: string, body?: unknown) =>
-      request<T>(baseUrl, path, {
-        method: "PUT",
-        body: body ? JSON.stringify(body) : undefined,
-      }),
+      request<T>(baseUrl, path, { method: "PUT", body: body ? JSON.stringify(body) : undefined }),
     patch: <T>(path: string, body?: unknown) =>
-      request<T>(baseUrl, path, {
-        method: "PATCH",
-        body: body ? JSON.stringify(body) : undefined,
-      }),
-    delete: <T>(path: string) =>
-      request<T>(baseUrl, path, { method: "DELETE" }),
+      request<T>(baseUrl, path, { method: "PATCH", body: body ? JSON.stringify(body) : undefined }),
+    delete: <T>(path: string) => request<T>(baseUrl, path, { method: "DELETE" }),
   };
 }
 
@@ -133,6 +128,26 @@ export const authApi = createApiClient(AUTH_BASE_URL);
 // Everything else goes to the ERP backend.
 export const erpApi = createApiClient(ERP_BASE_URL);
 
-// Back-compat alias — existing resource pages import `api` from here and
-// were already talking to the ERP backend.
+// Back-compat alias — existing pages import `api` from here.
 export const api = erpApi;
+
+// Turns a thrown ApiError into one readable line, including per-field
+// validation detail from a zod `.flatten()` payload when present (the ERP
+// backend returns a generic "Invalid input" message and puts the specifics
+// in `errors` — this surfaces them instead of hiding them).
+export function describeApiError(err: unknown, fallback = "Something went wrong. Please try again."): string {
+  if (!err || typeof err !== "object") return fallback;
+  const e = err as ApiError;
+  const parts: string[] = [];
+  if (e.message) parts.push(e.message);
+
+  const errors = e.errors as { formErrors?: string[]; fieldErrors?: Record<string, string[]> } | undefined;
+  if (errors?.fieldErrors) {
+    for (const [field, msgs] of Object.entries(errors.fieldErrors)) {
+      if (msgs?.length) parts.push(`${field}: ${msgs.join(", ")}`);
+    }
+  }
+  if (errors?.formErrors?.length) parts.push(...errors.formErrors);
+
+  return parts.length ? parts.join(" — ") : fallback;
+}

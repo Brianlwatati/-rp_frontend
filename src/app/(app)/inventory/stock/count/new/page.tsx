@@ -9,26 +9,25 @@ import { Field, inputClass } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { api, describeApiError } from "@/lib/api";
 import { useInventoryLookups } from "@/lib/inventoryLookups";
-import type { StockMovement } from "@/lib/types";
 
-// POST /inventory/stock/adjust only accepts these three reasons — TRANSFER_IN/
-// TRANSFER_OUT and STOCK_COUNT are generated automatically by the transfer
-// and stock-count endpoints instead, so they aren't offered here.
-const REASONS = ["RECEIVE", "SALE", "ADJUSTMENT"] as const;
-type AdjustReason = (typeof REASONS)[number];
+interface StockCountResult {
+  systemQuantity: number;
+  countedQuantity: number;
+  variance: number;
+  movement: unknown | null;
+}
 
-export default function NewStockMovementPage() {
+export default function NewStockCountPage() {
   const router = useRouter();
   const { products, warehouses } = useInventoryLookups();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [result, setResult] = useState<StockCountResult | null>(null);
 
   const [form, setForm] = useState({
     productId: "",
     warehouseId: "",
-    reason: "RECEIVE" as AdjustReason,
-    quantityDelta: "",
-    unitCost: "",
+    countedQuantity: "",
     notes: "",
   });
 
@@ -39,30 +38,21 @@ export default function NewStockMovementPage() {
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
-
-    const quantityDelta = Number(form.quantityDelta);
-    if (quantityDelta === 0) {
-      setError("Quantity change can't be 0.");
-      return;
-    }
-    if (form.reason === "RECEIVE" && !form.unitCost) {
-      setError("Unit cost is required for RECEIVE — it drives the weighted-average cost.");
-      return;
-    }
-
+    setResult(null);
     setSubmitting(true);
     try {
-      await api.post<StockMovement>("/inventory/stock/adjust", {
+      // POST /inventory/stock/count — reconciles a physical count against
+      // the system quantity. The difference posts as a STOCK_COUNT
+      // movement automatically; no movement is created if they match.
+      const res = await api.post<StockCountResult>("/inventory/stock/count", {
         productId: Number(form.productId),
         warehouseId: Number(form.warehouseId),
-        reason: form.reason,
-        quantityDelta,
-        unitCost: form.unitCost ? Number(form.unitCost) : undefined,
+        countedQuantity: Number(form.countedQuantity),
         notes: form.notes || undefined,
       });
-      router.push("/inventory/stock/movements");
+      setResult(res);
     } catch (err) {
-      setError(describeApiError(err, "Couldn't record this movement. Check the fields and try again."));
+      setError(describeApiError(err, "Couldn't record this count. Check the fields and try again."));
     } finally {
       setSubmitting(false);
     }
@@ -70,7 +60,7 @@ export default function NewStockMovementPage() {
 
   return (
     <>
-      <Topbar title="Record movement" description="Receive stock, record a sale, or make an adjustment." />
+      <Topbar title="Stock count" description="Reconcile a physical count against the system quantity." />
       <InventoryTabs />
 
       <div className="flex-1 overflow-y-auto p-4 sm:p-6">
@@ -111,60 +101,19 @@ export default function NewStockMovementPage() {
             </select>
           </Field>
 
-          <Field label="Reason" required>
-            <select
+          <Field label="Counted quantity" required hint="What you physically counted on hand.">
+            <input
               required
-              value={form.reason}
-              onChange={(e) => update("reason", e.target.value as AdjustReason)}
-              className={inputClass}
-            >
-              {REASONS.map((r) => (
-                <option key={r} value={r}>
-                  {r}
-                </option>
-              ))}
-            </select>
+              type="number"
+              min="0"
+              step="any"
+              value={form.countedQuantity}
+              onChange={(e) => update("countedQuantity", e.target.value)}
+              className={`${inputClass} font-mono`}
+            />
           </Field>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            <Field
-              label="Quantity change"
-              required
-              hint="Positive to add stock, negative to remove it. Can't be 0."
-            >
-              <input
-                required
-                type="number"
-                step="any"
-                value={form.quantityDelta}
-                onChange={(e) => update("quantityDelta", e.target.value)}
-                placeholder="e.g. 20 or -6"
-                className={`${inputClass} font-mono`}
-              />
-            </Field>
-            <Field
-              label="Unit cost"
-              required={form.reason === "RECEIVE"}
-              hint={
-                form.reason === "RECEIVE"
-                  ? "Required — drives the weighted-average cost."
-                  : "Ignored for SALE/ADJUSTMENT."
-              }
-            >
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                disabled={form.reason !== "RECEIVE"}
-                value={form.unitCost}
-                onChange={(e) => update("unitCost", e.target.value)}
-                placeholder="42.00"
-                className={`${inputClass} font-mono`}
-              />
-            </Field>
-          </div>
-
-          <Field label="Notes">
+          <Field label="Notes" hint="Optional — defaults to a variance note if left blank.">
             <textarea
               value={form.notes}
               onChange={(e) => update("notes", e.target.value)}
@@ -179,15 +128,29 @@ export default function NewStockMovementPage() {
             </p>
           )}
 
+          {result && (
+            <div className="rounded-lg border border-base-600 bg-base-700/30 px-3 py-2.5 text-sm space-y-1">
+              <p className="text-ink-300">
+                System had <span className="font-mono text-ink-100">{result.systemQuantity}</span>, you
+                counted <span className="font-mono text-ink-100">{result.countedQuantity}</span>.
+              </p>
+              <p className={result.variance === 0 ? "text-signal-green" : "text-signal-amber"}>
+                Variance: {result.variance > 0 ? "+" : ""}
+                {result.variance}
+                {result.variance === 0 ? " — no movement needed." : " — a STOCK_COUNT movement was recorded."}
+              </p>
+            </div>
+          )}
+
           <div className="flex items-center gap-3 pt-2">
             <Button type="submit" disabled={submitting}>
-              {submitting ? "Recording…" : "Record movement"}
+              {submitting ? "Recording…" : "Record count"}
             </Button>
             <Link
-              href="/inventory/stock/movements"
+              href="/inventory/stock"
               className="inline-flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium bg-base-700 text-ink-100 border border-base-600 hover:bg-base-700/70 transition-colors"
             >
-              Cancel
+              Back to stock
             </Link>
           </div>
         </form>
