@@ -11,7 +11,22 @@ import { api } from "@/lib/api";
 import type { Employee } from "@/lib/types";
 
 const FALLBACK_EMPLOYEES: Employee[] = [
-  { id: 1, ias_company_id: 2, employee_number: "EMP-001", first_name: "Sarah", last_name: "Bakery", email: "sarahbakery@gmail.com", phone: null, department: "Operations", job_title: "HR Admin", hire_date: "2026-01-15", salary: "80000.00", status: "ACTIVE", created_at: "2026-01-15T00:00:00.000Z", updated_at: "2026-01-15T00:00:00.000Z" },
+  {
+    id: 1,
+    ias_company_id: 2,
+    employee_number: "EMP-001",
+    first_name: "Sarah",
+    last_name: "Bakery",
+    email: "sarahbakery@gmail.com",
+    phone: null,
+    department: "Operations",
+    job_title: "HR Admin",
+    hire_date: "2026-01-15",
+    salary: "80000.00",
+    status: "ACTIVE",
+    created_at: "2026-01-15T00:00:00.000Z",
+    updated_at: "2026-01-15T00:00:00.000Z",
+  },
 ];
 
 export default function EmployeesPage() {
@@ -38,16 +53,27 @@ export default function EmployeesPage() {
     },
     { header: "Department", accessor: (e) => e.department ?? "—" },
     { header: "Title", accessor: (e) => e.job_title ?? "—" },
-    { header: "Salary", accessor: (e) => `$${Number(e.salary).toFixed(2)}`, align: "right" },
+    {
+      header: "Salary",
+      accessor: (e) => `$${Number(e.salary).toFixed(2)}`,
+      align: "right",
+    },
     {
       header: "Status",
-      accessor: (e) => <Badge tone={e.status === "ACTIVE" ? "green" : "neutral"}>{e.status}</Badge>,
+      accessor: (e) => (
+        <Badge tone={e.status === "ACTIVE" ? "green" : "neutral"}>
+          {e.status}
+        </Badge>
+      ),
     },
   ];
 
   return (
     <>
-      <Topbar title="Employees" description="Everyone on payroll at this company." />
+      <Topbar
+        title="Employees"
+        description="Everyone on payroll at this company."
+      />
       <HrTabs />
 
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
@@ -60,7 +86,11 @@ export default function EmployeesPage() {
             New employee
           </Link>
         </div>
-        <DataTable columns={columns} rows={employees} rowKey={(e) => String(e.id)} />
+        <DataTable
+          columns={columns}
+          rows={employees}
+          rowKey={(e) => String(e.id)}
+        />
       </div>
     </>
   );

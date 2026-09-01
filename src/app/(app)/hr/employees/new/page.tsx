@@ -27,7 +27,10 @@ export default function NewEmployeePage() {
     salary: "0",
   });
 
-  function update<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
+  function update<K extends keyof typeof form>(
+    key: K,
+    value: (typeof form)[K],
+  ) {
     setForm((f) => ({ ...f, [key]: value }));
   }
 
@@ -49,7 +52,12 @@ export default function NewEmployeePage() {
       });
       router.push("/hr/employees");
     } catch (err) {
-      setError(describeApiError(err, "Couldn't add this employee. Check the fields and try again."));
+      setError(
+        describeApiError(
+          err,
+          "Couldn't add this employee. Check the fields and try again.",
+        ),
+      );
     } finally {
       setSubmitting(false);
     }
@@ -100,7 +108,11 @@ export default function NewEmployeePage() {
               />
             </Field>
             <Field label="Phone">
-              <input value={form.phone} onChange={(e) => update("phone", e.target.value)} className={inputClass} />
+              <input
+                value={form.phone}
+                onChange={(e) => update("phone", e.target.value)}
+                className={inputClass}
+              />
             </Field>
           </div>
 

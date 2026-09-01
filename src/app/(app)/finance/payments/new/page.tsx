@@ -26,24 +26,41 @@ export default function NewPaymentPage() {
 
   const [customerId, setCustomerId] = useState("");
   const [amount, setAmount] = useState("");
+  const [paymentDate, setPaymentDate] = useState(
+    new Date().toISOString().split("T")[0],
+  );
   const [paymentReference, setPaymentReference] = useState("");
   const [method, setMethod] = useState("CASH");
   const [notes, setNotes] = useState("");
-  const [allocations, setAllocations] = useState<AllocationRow[]>([{ ...EMPTY_ROW }]);
+  const [allocations, setAllocations] = useState<AllocationRow[]>([
+    { ...EMPTY_ROW },
+  ]);
 
   useEffect(() => {
-    api.get<Contact[]>("/contacts?type=CUSTOMER").then(setCustomers).catch(() => setCustomers([]));
-    api.get<Receivable[]>("/finance/receivables").then(setReceivables).catch(() => setReceivables([]));
+    api
+      .get<Contact[]>("/contacts?type=CUSTOMER")
+      .then(setCustomers)
+      .catch(() => setCustomers([]));
+    api
+      .get<Receivable[]>("/finance/receivables")
+      .then(setReceivables)
+      .catch(() => setReceivables([]));
   }, []);
 
   function updateRow(i: number, patch: Partial<AllocationRow>) {
-    setAllocations((rows) => rows.map((row, idx) => (idx === i ? { ...row, ...patch } : row)));
+    setAllocations((rows) =>
+      rows.map((row, idx) => (idx === i ? { ...row, ...patch } : row)),
+    );
   }
+
   function addRow() {
     setAllocations((rows) => [...rows, { ...EMPTY_ROW }]);
   }
+
   function removeRow(i: number) {
-    setAllocations((rows) => (rows.length > 1 ? rows.filter((_, idx) => idx !== i) : rows));
+    setAllocations((rows) =>
+      rows.length > 1 ? rows.filter((_, idx) => idx !== i) : rows,
+    );
   }
 
   async function onSubmit(e: FormEvent) {
@@ -51,20 +68,31 @@ export default function NewPaymentPage() {
     setError(null);
     setResult(null);
     setSubmitting(true);
+
     try {
       const res = await api.post<Payment>("/finance/payments", {
         customerId: customerId ? Number(customerId) : undefined,
         amount: Number(amount),
+        paymentDate: paymentDate || undefined,
         paymentReference: paymentReference || undefined,
         method: method || undefined,
         notes: notes || undefined,
         allocations: allocations
           .filter((a) => a.invoiceId)
-          .map((a) => ({ invoiceId: Number(a.invoiceId), amount: Number(a.amount) })),
+          .map((a) => ({
+            invoiceId: Number(a.invoiceId),
+            amount: Number(a.amount),
+          })),
       });
+
       setResult(res);
     } catch (err) {
-      setError(describeApiError(err, "Couldn't record this payment. Check the fields and try again."));
+      setError(
+        describeApiError(
+          err,
+          "Couldn't record this payment. Check the fields and try again.",
+        ),
+      );
     } finally {
       setSubmitting(false);
     }
@@ -72,14 +100,21 @@ export default function NewPaymentPage() {
 
   return (
     <>
-      <Topbar title="Record payment" description="Applies against one or more open invoices." />
+      <Topbar
+        title="Record payment"
+        description="Applies against one or more open invoices."
+      />
       <FinanceTabs />
 
       <div className="flex-1 overflow-y-auto p-4 sm:p-6">
         <form onSubmit={onSubmit} className="max-w-2xl panel p-6 space-y-5">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <Field label="Customer" hint="Optional — for your own records.">
-              <select value={customerId} onChange={(e) => setCustomerId(e.target.value)} className={inputClass}>
+              <select
+                value={customerId}
+                onChange={(e) => setCustomerId(e.target.value)}
+                className={inputClass}
+              >
                 <option value="">Not specified</option>
                 {customers.map((c) => (
                   <option key={c.id} value={c.id}>
@@ -88,6 +123,7 @@ export default function NewPaymentPage() {
                 ))}
               </select>
             </Field>
+
             <Field label="Amount received" required>
               <input
                 required
@@ -102,7 +138,20 @@ export default function NewPaymentPage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            <Field label="Reference" hint="Optional — auto-generated if left blank.">
+            <Field label="Payment date" required>
+              <input
+                required
+                type="date"
+                value={paymentDate}
+                onChange={(e) => setPaymentDate(e.target.value)}
+                className={inputClass}
+              />
+            </Field>
+
+            <Field
+              label="Reference"
+              hint="Optional — auto-generated if left blank."
+            >
               <input
                 value={paymentReference}
                 onChange={(e) => setPaymentReference(e.target.value)}
@@ -110,8 +159,15 @@ export default function NewPaymentPage() {
                 className={`${inputClass} font-mono`}
               />
             </Field>
+          </div>
+
+          <div>
             <Field label="Method">
-              <select value={method} onChange={(e) => setMethod(e.target.value)} className={inputClass}>
+              <select
+                value={method}
+                onChange={(e) => setMethod(e.target.value)}
+                className={inputClass}
+              >
                 <option value="CASH">Cash</option>
                 <option value="BANK_TRANSFER">Bank transfer</option>
                 <option value="MOBILE_MONEY">Mobile money</option>
@@ -124,27 +180,36 @@ export default function NewPaymentPage() {
             <p className="text-xs font-medium text-ink-300 mb-2">
               Apply to invoices <span className="text-signal-red">*</span>
             </p>
+
             <div className="space-y-3">
               {allocations.map((row, i) => (
-                <div key={i} className="flex flex-col sm:flex-row gap-2 sm:items-end">
+                <div
+                  key={i}
+                  className="flex flex-col sm:flex-row gap-2 sm:items-end"
+                >
                   <div className="flex-1">
                     <select
                       required
                       value={row.invoiceId}
-                      onChange={(e) => updateRow(i, { invoiceId: e.target.value })}
+                      onChange={(e) =>
+                        updateRow(i, { invoiceId: e.target.value })
+                      }
                       className={inputClass}
                     >
                       <option value="" disabled>
                         Select an invoice…
                       </option>
+
                       {receivables.map((r) => (
                         <option key={r.id} value={r.id}>
-                          {r.invoice_number} · {r.customerName ?? `#${r.customer_id}`} · $
+                          {r.invoice_number} ·{" "}
+                          {r.customerName ?? `#${r.customer_id}`} · $
                           {Number(r.outstanding).toFixed(2)} due
                         </option>
                       ))}
                     </select>
                   </div>
+
                   <input
                     required
                     type="number"
@@ -155,6 +220,7 @@ export default function NewPaymentPage() {
                     placeholder="Amount"
                     className={`${inputClass} font-mono w-full sm:w-32`}
                   />
+
                   <button
                     type="button"
                     onClick={() => removeRow(i)}
@@ -166,6 +232,7 @@ export default function NewPaymentPage() {
                 </div>
               ))}
             </div>
+
             <button
               type="button"
               onClick={addRow}
@@ -177,7 +244,12 @@ export default function NewPaymentPage() {
           </div>
 
           <Field label="Notes">
-            <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} className={inputClass} />
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              rows={2}
+              className={inputClass}
+            />
           </Field>
 
           {error && (
@@ -192,11 +264,22 @@ export default function NewPaymentPage() {
                 <CheckCircle2 size={15} />
                 Payment recorded
               </p>
+
               <p className="text-ink-300">
-                Reference <span className="font-mono text-ink-100">{result.payment_reference}</span> ·{" "}
-                <span className="font-mono text-ink-100">${Number(result.amount).toFixed(2)}</span>
+                Reference{" "}
+                <span className="font-mono text-ink-100">
+                  {result.payment_reference}
+                </span>{" "}
+                ·{" "}
+                <span className="font-mono text-ink-100">
+                  ${Number(result.amount).toFixed(2)}
+                </span>
               </p>
-              <Link href="/finance/receivables" className="text-signal-cyan hover:text-signal-cyan/80 text-xs">
+
+              <Link
+                href="/finance/receivables"
+                className="text-signal-cyan hover:text-signal-cyan/80 text-xs"
+              >
                 View updated receivables →
               </Link>
             </div>
@@ -206,6 +289,7 @@ export default function NewPaymentPage() {
             <Button type="submit" disabled={submitting}>
               {submitting ? "Recording…" : "Record payment"}
             </Button>
+
             <Link
               href="/finance/receivables"
               className="inline-flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium bg-base-700 text-ink-100 border border-base-600 hover:bg-base-700/70 transition-colors"

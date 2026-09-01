@@ -12,7 +12,18 @@ import { useEmployeeLookups } from "@/lib/hrLookups";
 import type { Attendance } from "@/lib/types";
 
 const FALLBACK_ATTENDANCE: Attendance[] = [
-  { id: 1, ias_company_id: 2, employee_id: 1, attendance_date: "2026-08-31", clock_in: "09:02", clock_out: "17:15", notes: null, employeeNumber: "EMP-001", firstName: "Sarah", lastName: "Bakery" },
+  {
+    id: 1,
+    ias_company_id: 2,
+    employee_id: 1,
+    attendance_date: "2026-08-31",
+    clock_in: "09:02",
+    clock_out: "17:15",
+    notes: null,
+    employeeNumber: "EMP-001",
+    firstName: "Sarah",
+    lastName: "Bakery",
+  },
 ];
 
 export default function AttendancePage() {
@@ -58,10 +69,16 @@ export default function AttendancePage() {
   }
 
   const columns: Column<Attendance>[] = [
-    { header: "Date", accessor: (a) => new Date(a.attendance_date).toLocaleDateString() },
+    {
+      header: "Date",
+      accessor: (a) => new Date(a.attendance_date).toLocaleDateString(),
+    },
     {
       header: "Employee",
-      accessor: (a) => (a.firstName ? `${a.firstName} ${a.lastName} (${a.employeeNumber})` : `#${a.employee_id}`),
+      accessor: (a) =>
+        a.firstName
+          ? `${a.firstName} ${a.lastName} (${a.employeeNumber})`
+          : `#${a.employee_id}`,
     },
     { header: "Clock in", accessor: (a) => a.clock_in ?? "—" },
     { header: "Clock out", accessor: (a) => a.clock_out ?? "—" },
@@ -78,7 +95,12 @@ export default function AttendancePage() {
           <p className="label-eyebrow">Record attendance</p>
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
             <Field label="Employee" required>
-              <select required value={employeeId} onChange={(e) => setEmployeeId(e.target.value)} className={inputClass}>
+              <select
+                required
+                value={employeeId}
+                onChange={(e) => setEmployeeId(e.target.value)}
+                className={inputClass}
+              >
                 <option value="" disabled>
                   Select…
                 </option>
@@ -90,13 +112,28 @@ export default function AttendancePage() {
               </select>
             </Field>
             <Field label="Date" hint="Defaults to today.">
-              <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={inputClass} />
+              <input
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                className={inputClass}
+              />
             </Field>
             <Field label="Clock in">
-              <input type="time" value={clockIn} onChange={(e) => setClockIn(e.target.value)} className={inputClass} />
+              <input
+                type="time"
+                value={clockIn}
+                onChange={(e) => setClockIn(e.target.value)}
+                className={inputClass}
+              />
             </Field>
             <Field label="Clock out">
-              <input type="time" value={clockOut} onChange={(e) => setClockOut(e.target.value)} className={inputClass} />
+              <input
+                type="time"
+                value={clockOut}
+                onChange={(e) => setClockOut(e.target.value)}
+                className={inputClass}
+              />
             </Field>
           </div>
           {error && (
@@ -110,7 +147,11 @@ export default function AttendancePage() {
           </Button>
         </form>
 
-        <DataTable columns={columns} rows={records} rowKey={(a) => String(a.id)} />
+        <DataTable
+          columns={columns}
+          rows={records}
+          rowKey={(a) => String(a.id)}
+        />
       </div>
     </>
   );

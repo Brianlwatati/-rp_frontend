@@ -11,7 +11,21 @@ import { api, describeApiError } from "@/lib/api";
 import type { LeaveRequest, LeaveStatus } from "@/lib/types";
 
 const FALLBACK_LEAVE: LeaveRequest[] = [
-  { id: 1, ias_company_id: 2, employee_id: 1, leave_type: "ANNUAL", starts_on: "2026-09-05", ends_on: "2026-09-09", reason: "Family trip", status: "PENDING", approved_by: null, created_at: "2026-08-20T00:00:00.000Z", employeeNumber: "EMP-001", firstName: "Sarah", lastName: "Bakery" },
+  {
+    id: 1,
+    ias_company_id: 2,
+    employee_id: 1,
+    leave_type: "ANNUAL",
+    starts_on: "2026-09-05",
+    ends_on: "2026-09-09",
+    reason: "Family trip",
+    status: "PENDING",
+    approved_by: null,
+    created_at: "2026-08-20T00:00:00.000Z",
+    employeeNumber: "EMP-001",
+    firstName: "Sarah",
+    lastName: "Bakery",
+  },
 ];
 
 const STATUS_TONE: Record<LeaveStatus, "amber" | "green" | "red"> = {
@@ -50,15 +64,22 @@ export default function LeavePage() {
   const columns: Column<LeaveRequest>[] = [
     {
       header: "Employee",
-      accessor: (l) => (l.firstName ? `${l.firstName} ${l.lastName} (${l.employeeNumber})` : `#${l.employee_id}`),
+      accessor: (l) =>
+        l.firstName
+          ? `${l.firstName} ${l.lastName} (${l.employeeNumber})`
+          : `#${l.employee_id}`,
     },
     { header: "Type", accessor: (l) => l.leave_type },
     {
       header: "Dates",
-      accessor: (l) => `${new Date(l.starts_on).toLocaleDateString()} – ${new Date(l.ends_on).toLocaleDateString()}`,
+      accessor: (l) =>
+        `${new Date(l.starts_on).toLocaleDateString()} – ${new Date(l.ends_on).toLocaleDateString()}`,
     },
     { header: "Reason", accessor: (l) => l.reason ?? "—" },
-    { header: "Status", accessor: (l) => <Badge tone={STATUS_TONE[l.status]}>{l.status}</Badge> },
+    {
+      header: "Status",
+      accessor: (l) => <Badge tone={STATUS_TONE[l.status]}>{l.status}</Badge>,
+    },
     {
       header: "",
       accessor: (l) =>
@@ -97,7 +118,11 @@ export default function LeavePage() {
             Request leave
           </Link>
         </div>
-        <DataTable columns={columns} rows={requests} rowKey={(l) => String(l.id)} />
+        <DataTable
+          columns={columns}
+          rows={requests}
+          rowKey={(l) => String(l.id)}
+        />
       </div>
     </>
   );
