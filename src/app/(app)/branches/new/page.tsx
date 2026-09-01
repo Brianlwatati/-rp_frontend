@@ -15,7 +15,10 @@ export default function NewBranchPage() {
   const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState({ name: "", code: "" });
 
-  function update<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
+  function update<K extends keyof typeof form>(
+    key: K,
+    value: (typeof form)[K],
+  ) {
     setForm((f) => ({ ...f, [key]: value }));
   }
 
@@ -24,10 +27,18 @@ export default function NewBranchPage() {
     setError(null);
     setSubmitting(true);
     try {
-      await api.post<ErpBranch>("/branches", { name: form.name, code: form.code });
+      await api.post<ErpBranch>("/branches", {
+        name: form.name,
+        code: form.code,
+      });
       router.push("/branches");
     } catch (err) {
-      setError(describeApiError(err, "Couldn't create the branch. Check the fields and try again."));
+      setError(
+        describeApiError(
+          err,
+          "Couldn't create the branch. Check the fields and try again.",
+        ),
+      );
     } finally {
       setSubmitting(false);
     }
@@ -35,7 +46,10 @@ export default function NewBranchPage() {
 
   return (
     <>
-      <Topbar title="New branch" description="Register a physical location for this company." />
+      <Topbar
+        title="New branch"
+        description="Register a physical location for this company."
+      />
       <div className="flex-1 overflow-y-auto p-4 sm:p-6">
         <form onSubmit={onSubmit} className="max-w-xl panel p-6 space-y-5">
           <Field label="Name" required>
@@ -49,7 +63,11 @@ export default function NewBranchPage() {
             />
           </Field>
 
-          <Field label="Code" required hint="Uppercase letters, numbers, - and _ only.">
+          <Field
+            label="Code"
+            required
+            hint="Uppercase letters, numbers, - and _ only."
+          >
             <input
               required
               pattern="[A-Z0-9_-]+"

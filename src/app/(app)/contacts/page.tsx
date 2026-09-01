@@ -10,11 +10,41 @@ import { api } from "@/lib/api";
 import type { Contact } from "@/lib/types";
 
 const FALLBACK_CONTACTS: Contact[] = [
-  { id: 1, iasCompanyId: 2, contactType: "CUSTOMER", name: "Harbor Logistics", phone: "+254700000001", email: "ap@harborlogistics.com", address: null, taxId: null, creditLimit: "5000.00", status: "ACTIVE", createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z" },
-  { id: 2, iasCompanyId: 2, contactType: "SUPPLIER", name: "Nairobi Steel Co.", phone: "+254700000002", email: "sales@nairobisteel.co.ke", address: null, taxId: "P000111222A", creditLimit: null, status: "ACTIVE", createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z" },
+  {
+    id: 1,
+    iasCompanyId: 2,
+    contactType: "CUSTOMER",
+    name: "Harbor Logistics",
+    phone: "+254700000001",
+    email: "ap@harborlogistics.com",
+    address: null,
+    taxId: null,
+    creditLimit: "5000.00",
+    status: "ACTIVE",
+    createdAt: "2026-01-01T00:00:00.000Z",
+    updatedAt: "2026-01-01T00:00:00.000Z",
+  },
+  {
+    id: 2,
+    iasCompanyId: 2,
+    contactType: "SUPPLIER",
+    name: "Nairobi Steel Co.",
+    phone: "+254700000002",
+    email: "sales@nairobisteel.co.ke",
+    address: null,
+    taxId: "P000111222A",
+    creditLimit: null,
+    status: "ACTIVE",
+    createdAt: "2026-01-01T00:00:00.000Z",
+    updatedAt: "2026-01-01T00:00:00.000Z",
+  },
 ];
 
-const TYPE_TONE = { CUSTOMER: "green", SUPPLIER: "amber", BOTH: "cyan" } as const;
+const TYPE_TONE = {
+  CUSTOMER: "green",
+  SUPPLIER: "amber",
+  BOTH: "cyan",
+} as const;
 
 export default function ContactsPage() {
   const [contacts, setContacts] = useState<Contact[]>(FALLBACK_CONTACTS);
@@ -27,13 +57,25 @@ export default function ContactsPage() {
   }, []);
 
   const columns: Column<Contact>[] = [
-    { header: "Name", accessor: (c) => <span className="text-ink-100">{c.name}</span> },
-    { header: "Type", accessor: (c) => <Badge tone={TYPE_TONE[c.contactType]}>{c.contactType}</Badge> },
+    {
+      header: "Name",
+      accessor: (c) => <span className="text-ink-100">{c.name}</span>,
+    },
+    {
+      header: "Type",
+      accessor: (c) => (
+        <Badge tone={TYPE_TONE[c.contactType]}>{c.contactType}</Badge>
+      ),
+    },
     { header: "Email", accessor: (c) => c.email ?? "—" },
     { header: "Phone", accessor: (c) => c.phone ?? "—" },
     {
       header: "Status",
-      accessor: (c) => <Badge tone={c.status === "ACTIVE" ? "green" : "neutral"}>{c.status}</Badge>,
+      accessor: (c) => (
+        <Badge tone={c.status === "ACTIVE" ? "green" : "neutral"}>
+          {c.status}
+        </Badge>
+      ),
     },
     {
       header: "",
@@ -53,7 +95,10 @@ export default function ContactsPage() {
 
   return (
     <>
-      <Topbar title="Contacts" description="Customers and suppliers this company deals with." />
+      <Topbar
+        title="Contacts"
+        description="Customers and suppliers this company deals with."
+      />
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
         <div className="flex justify-end">
           <Link
@@ -64,7 +109,11 @@ export default function ContactsPage() {
             New contact
           </Link>
         </div>
-        <DataTable columns={columns} rows={contacts} rowKey={(c) => String(c.id)} />
+        <DataTable
+          columns={columns}
+          rows={contacts}
+          rowKey={(c) => String(c.id)}
+        />
       </div>
     </>
   );

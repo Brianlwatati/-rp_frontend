@@ -21,7 +21,7 @@ import { useSidebar } from "@/context/SidebarContext";
 
 const PRIMARY_NAV = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/inventory", label: "Inventory", icon: Boxes },
+  { href: "/inventory", label: "Products", icon: Boxes },
   { href: "/sales", label: "Sales", icon: ClipboardList },
   { href: "/purchasing", label: "Purchasing", icon: Truck },
   { href: "/contacts", label: "Contacts", icon: Contact },
@@ -75,14 +75,23 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
       </nav>
 
       <div className="border-t border-base-600/60 pt-3 mt-3">
-        <NavItem href="/settings" label="Settings" icon={Settings} onNavigate={onNavigate} />
+        <NavItem
+          href="/settings"
+          label="Settings"
+          icon={Settings}
+          onNavigate={onNavigate}
+        />
 
         <div className="mt-3 flex items-center gap-2.5 rounded-lg px-3 py-2">
           <div className="h-8 w-8 shrink-0 rounded-full bg-base-700 border border-base-600 flex items-center justify-center">
-            <span className="text-[11px] font-mono text-ink-300">{initials}</span>
+            <span className="text-[11px] font-mono text-ink-300">
+              {initials}
+            </span>
           </div>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm text-ink-100">{user?.email ?? "Signed-in operator"}</p>
+            <p className="truncate text-sm text-ink-100">
+              {user?.email ?? "Signed-in operator"}
+            </p>
             <p className="truncate text-[11px] text-ink-500 font-mono">
               {user?.roleName ?? "Operator"}
             </p>
@@ -104,7 +113,9 @@ function Brand() {
   return (
     <div className="mb-4 flex items-center gap-2 px-1">
       <div className="h-7 w-7 rounded-md bg-signal-cyan/15 border border-signal-cyan/40 flex items-center justify-center">
-        <span className="font-display font-bold text-signal-cyan text-xs">IA</span>
+        <span className="font-display font-bold text-signal-cyan text-xs">
+          IA
+        </span>
       </div>
       <span className="font-display text-sm font-semibold tracking-tight text-ink-100">
         IAS Console
@@ -127,7 +138,9 @@ export function Sidebar() {
       {/* Mobile backdrop */}
       <div
         className={`no-print md:hidden fixed inset-0 z-40 bg-black/50 transition-opacity ${
-          mobileOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+          mobileOpen
+            ? "opacity-100 pointer-events-auto"
+            : "opacity-0 pointer-events-none"
         }`}
         onClick={closeMobile}
         aria-hidden="true"
@@ -144,7 +157,9 @@ export function Sidebar() {
         <div className="mb-4 flex items-center justify-between px-1">
           <div className="flex items-center gap-2">
             <div className="h-7 w-7 rounded-md bg-signal-cyan/15 border border-signal-cyan/40 flex items-center justify-center">
-              <span className="font-display font-bold text-signal-cyan text-xs">IA</span>
+              <span className="font-display font-bold text-signal-cyan text-xs">
+                IA
+              </span>
             </div>
             <span className="font-display text-sm font-semibold tracking-tight text-ink-100">
               IAS Console

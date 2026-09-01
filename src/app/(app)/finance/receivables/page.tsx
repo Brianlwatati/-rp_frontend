@@ -11,10 +11,24 @@ import { api } from "@/lib/api";
 import type { Receivable, InvoiceStatus } from "@/lib/types";
 
 const FALLBACK_AR: Receivable[] = [
-  { id: 1, ias_company_id: 2, invoice_number: "INV-1723800000000", customer_id: 1, customerName: "Harbor Logistics", status: "PARTIALLY_PAID", due_date: null, total_amount: "620.00", paid_amount: "300.00", outstanding: "320.00" },
+  {
+    id: 1,
+    ias_company_id: 2,
+    invoice_number: "INV-1723800000000",
+    customer_id: 1,
+    customerName: "Harbor Logistics",
+    status: "PARTIALLY_PAID",
+    due_date: null,
+    total_amount: "620.00",
+    paid_amount: "300.00",
+    outstanding: "320.00",
+  },
 ];
 
-const STATUS_TONE: Record<InvoiceStatus, "neutral" | "amber" | "green" | "red"> = {
+const STATUS_TONE: Record<
+  InvoiceStatus,
+  "neutral" | "amber" | "green" | "red"
+> = {
   OPEN: "neutral",
   PARTIALLY_PAID: "amber",
   PAID: "green",
@@ -31,20 +45,36 @@ export default function ReceivablesPage() {
       .catch(() => setRows(FALLBACK_AR));
   }, []);
 
-  const totalOutstanding = rows.reduce((sum, r) => sum + Number(r.outstanding), 0);
+  const totalOutstanding = rows.reduce(
+    (sum, r) => sum + Number(r.outstanding),
+    0,
+  );
 
   const columns: Column<Receivable>[] = [
     {
       header: "Invoice",
       accessor: (r) => (
-        <Link href={`/finance/invoices/${r.id}`} className="font-mono text-ink-100 hover:text-signal-cyan">
+        <Link
+          href={`/finance/invoices/${r.id}`}
+          className="font-mono text-ink-100 hover:text-signal-cyan"
+        >
           {r.invoice_number}
         </Link>
       ),
     },
-    { header: "Customer", accessor: (r) => r.customerName ?? `Contact #${r.customer_id}` },
-    { header: "Status", accessor: (r) => <Badge tone={STATUS_TONE[r.status]}>{r.status}</Badge> },
-    { header: "Due date", accessor: (r) => (r.due_date ? new Date(r.due_date).toLocaleDateString() : "—") },
+    {
+      header: "Customer",
+      accessor: (r) => r.customerName ?? `Contact #${r.customer_id}`,
+    },
+    {
+      header: "Status",
+      accessor: (r) => <Badge tone={STATUS_TONE[r.status]}>{r.status}</Badge>,
+    },
+    {
+      header: "Due date",
+      accessor: (r) =>
+        r.due_date ? new Date(r.due_date).toLocaleDateString() : "—",
+    },
     {
       header: "Outstanding",
       accessor: (r) => `$${Number(r.outstanding).toFixed(2)}`,
@@ -54,13 +84,19 @@ export default function ReceivablesPage() {
 
   return (
     <>
-      <Topbar title="Receivables" description="Open and partially-paid invoices." />
+      <Topbar
+        title="Receivables"
+        description="Open and partially-paid invoices."
+      />
       <FinanceTabs />
 
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm text-ink-500">
-            Total outstanding <span className="text-ink-100 font-mono">${totalOutstanding.toFixed(2)}</span>
+            Total outstanding{" "}
+            <span className="text-ink-100 font-mono">
+              ${totalOutstanding.toFixed(2)}
+            </span>
           </p>
           <Link
             href="/finance/payments/new"

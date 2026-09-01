@@ -24,7 +24,10 @@ export default function NewContactPage() {
     creditLimit: "",
   });
 
-  function update<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
+  function update<K extends keyof typeof form>(
+    key: K,
+    value: (typeof form)[K],
+  ) {
     setForm((f) => ({ ...f, [key]: value }));
   }
 
@@ -44,7 +47,12 @@ export default function NewContactPage() {
       });
       router.push("/contacts");
     } catch (err) {
-      setError(describeApiError(err, "Couldn't create this contact. Check the fields and try again."));
+      setError(
+        describeApiError(
+          err,
+          "Couldn't create this contact. Check the fields and try again.",
+        ),
+      );
     } finally {
       setSubmitting(false);
     }
@@ -58,7 +66,9 @@ export default function NewContactPage() {
           <Field label="Type" required>
             <select
               value={form.contactType}
-              onChange={(e) => update("contactType", e.target.value as ContactType)}
+              onChange={(e) =>
+                update("contactType", e.target.value as ContactType)
+              }
               className={inputClass}
             >
               <option value="CUSTOMER">Customer</option>
