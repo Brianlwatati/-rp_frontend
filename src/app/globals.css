@@ -91,3 +91,20 @@
     background-size: 22px 22px;
   }
 }
+
+/* Printing a receipt/invoice/PO: hide the app chrome entirely and let the
+   receipt-printable card fill the page. The card itself is always scoped
+   to data-theme="light" (see ReceiptDocument) so it prints on white
+   regardless of which theme the app is in. */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: white !important;
+  }
+  .receipt-printable {
+    box-shadow: none !important;
+    border: none !important;
+  }
+}

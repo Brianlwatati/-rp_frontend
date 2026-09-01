@@ -1,14 +1,23 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Boxes, ClipboardList, Contact as ContactIcon, ShieldCheck } from "lucide-react";
+import Link from "next/link";
+import { DollarSign, Receipt, Boxes, ClipboardList, Truck } from "lucide-react";
 import { Topbar } from "@/components/layout/Topbar";
 import { StatCard } from "@/components/ui/StatCard";
 import { DataTable, Column } from "@/components/ui/DataTable";
 import { Badge } from "@/components/ui/Badge";
 import { api } from "@/lib/api";
-import type { SalesOrder, SalesOrderStatus, LowStockItem, Contact, ErpRole } from "@/lib/types";
+import type { SalesOrder, SalesOrderStatus, DashboardSummary } from "@/lib/types";
 import { useAuth } from "@/context/AuthContext";
+
+const FALLBACK_SUMMARY: DashboardSummary = {
+  salesValue: "6110.00",
+  outstandingInvoices: "320.00",
+  stockValue: "4272.00",
+  openOrders: "2",
+  openPurchaseOrders: "1",
+};
 
 const FALLBACK_ORDERS: SalesOrder[] = [
   { id: 1, ias_company_id: 2, order_number: "SO-1042", customer_id: 1, warehouse_id: 1, status: "SHIPPED", currency: "USD", subtotal: "4820.00", discount_amount: "0.00", tax_amount: "0.00", total_amount: "4820.00", notes: null, created_by: 1, created_at: "2026-08-14T00:00:00.000Z", updated_at: "2026-08-14T00:00:00.000Z", customerName: "Harbor Logistics", warehouseName: "Nairobi Central" },
@@ -24,31 +33,19 @@ const STATUS_TONE: Record<SalesOrderStatus, "neutral" | "amber" | "green" | "red
 
 export default function DashboardPage() {
   const { user } = useAuth();
+  const [summary, setSummary] = useState<DashboardSummary>(FALLBACK_SUMMARY);
   const [orders, setOrders] = useState<SalesOrder[]>(FALLBACK_ORDERS);
-  const [lowStockCount, setLowStockCount] = useState<number | null>(null);
-  const [activeContacts, setActiveContacts] = useState<number | null>(null);
-  const [activeRoles, setActiveRoles] = useState<number | null>(null);
 
   useEffect(() => {
+    api
+      .get<DashboardSummary>("/reporting/dashboard")
+      .then(setSummary)
+      .catch(() => setSummary(FALLBACK_SUMMARY));
     api
       .get<SalesOrder[]>("/sales/orders")
       .then((rows) => setOrders(rows.slice(0, 5)))
       .catch(() => setOrders(FALLBACK_ORDERS));
-    api
-      .get<LowStockItem[]>("/inventory/stock/low")
-      .then((rows) => setLowStockCount(rows.length))
-      .catch(() => setLowStockCount(null));
-    api
-      .get<Contact[]>("/contacts")
-      .then((rows) => setActiveContacts(rows.filter((c) => c.status === "ACTIVE").length))
-      .catch(() => setActiveContacts(null));
-    api
-      .get<ErpRole[]>("/roles")
-      .then((rows) => setActiveRoles(rows.filter((r) => r.status === "ACTIVE").length))
-      .catch(() => setActiveRoles(null));
   }, []);
-
-  const openOrders = orders.filter((o) => o.status === "DRAFT" || o.status === "CONFIRMED").length;
 
   const columns: Column<SalesOrder>[] = [
     { header: "Order", accessor: (o) => <span className="font-mono text-ink-100">{o.order_number}</span> },
@@ -70,32 +67,25 @@ export default function DashboardPage() {
       />
 
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard label="Open orders" value={String(openOrders)} icon={ClipboardList} />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          <StatCard label="Sales value" value={`$${Number(summary.salesValue).toLocaleString()}`} icon={DollarSign} />
           <StatCard
-            label="Low stock"
-            value={lowStockCount === null ? "—" : String(lowStockCount)}
-            trend={lowStockCount ? "down" : "flat"}
-            icon={Boxes}
+            label="Outstanding"
+            value={`$${Number(summary.outstandingInvoices).toLocaleString()}`}
+            icon={Receipt}
+            trend={Number(summary.outstandingInvoices) > 0 ? "down" : "flat"}
           />
-          <StatCard
-            label="Active contacts"
-            value={activeContacts === null ? "—" : String(activeContacts)}
-            icon={ContactIcon}
-          />
-          <StatCard
-            label="Active roles"
-            value={activeRoles === null ? "—" : String(activeRoles)}
-            icon={ShieldCheck}
-          />
+          <StatCard label="Stock value" value={`$${Number(summary.stockValue).toLocaleString()}`} icon={Boxes} />
+          <StatCard label="Open orders" value={summary.openOrders} icon={ClipboardList} />
+          <StatCard label="Open POs" value={summary.openPurchaseOrders} icon={Truck} />
         </div>
 
         <div>
           <div className="flex items-center justify-between mb-3">
             <h2 className="font-display text-base font-semibold text-ink-100">Recent orders</h2>
-            <a href="/sales" className="text-sm text-signal-cyan hover:text-signal-cyan/80">
+            <Link href="/sales" className="text-sm text-signal-cyan hover:text-signal-cyan/80">
               View all
-            </a>
+            </Link>
           </div>
           <DataTable columns={columns} rows={orders} rowKey={(o) => String(o.id)} />
         </div>

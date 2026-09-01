@@ -13,7 +13,7 @@ export function Topbar({ title, description }: TopbarProps) {
   const { openMobile } = useSidebar();
 
   return (
-    <header className="flex items-center justify-between gap-3 border-b border-base-600/60 bg-base-900/60 px-4 sm:px-6 py-4 backdrop-blur">
+    <header className="no-print flex items-center justify-between gap-3 border-b border-base-600/60 bg-base-900/60 px-4 sm:px-6 py-4 backdrop-blur">
       <div className="flex items-center gap-3 min-w-0">
         <button
           onClick={openMobile}

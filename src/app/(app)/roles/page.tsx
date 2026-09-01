@@ -10,26 +10,8 @@ import { api, describeApiError } from "@/lib/api";
 import type { ErpRole } from "@/lib/types";
 
 const FALLBACK_ROLES: ErpRole[] = [
-  {
-    id: 1,
-    iasCompanyId: 2,
-    name: "Admin",
-    code: "ADMIN",
-    isDefault: false,
-    status: "ACTIVE",
-    createdAt: "2026-01-01T00:00:00.000Z",
-    updatedAt: "2026-01-01T00:00:00.000Z",
-  },
-  {
-    id: 2,
-    iasCompanyId: 2,
-    name: "Warehouse Operator",
-    code: "WH_OPERATOR",
-    isDefault: true,
-    status: "ACTIVE",
-    createdAt: "2026-01-01T00:00:00.000Z",
-    updatedAt: "2026-01-01T00:00:00.000Z",
-  },
+  { id: 1, iasCompanyId: 2, name: "Admin", code: "ADMIN", isDefault: false, status: "ACTIVE", createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z" },
+  { id: 2, iasCompanyId: 2, name: "Warehouse Operator", code: "WH_OPERATOR", isDefault: true, status: "ACTIVE", createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-01-01T00:00:00.000Z" },
 ];
 
 export default function RolesPage() {
@@ -57,25 +39,15 @@ export default function RolesPage() {
   }
 
   const columns: Column<ErpRole>[] = [
-    {
-      header: "Role",
-      accessor: (r) => <span className="text-ink-100">{r.name}</span>,
-    },
-    {
-      header: "Code",
-      accessor: (r) => <span className="font-mono text-xs">{r.code}</span>,
-    },
+    { header: "Role", accessor: (r) => <span className="text-ink-100">{r.name}</span> },
+    { header: "Code", accessor: (r) => <span className="font-mono text-xs">{r.code}</span> },
     {
       header: "Default",
       accessor: (r) => (r.isDefault ? <Badge tone="cyan">Default</Badge> : "—"),
     },
     {
       header: "Status",
-      accessor: (r) => (
-        <Badge tone={r.status === "ACTIVE" ? "green" : "neutral"}>
-          {r.status}
-        </Badge>
-      ),
+      accessor: (r) => <Badge tone={r.status === "ACTIVE" ? "green" : "neutral"}>{r.status}</Badge>,
     },
     {
       header: "",
@@ -104,10 +76,7 @@ export default function RolesPage() {
 
   return (
     <>
-      <Topbar
-        title="Roles"
-        description="ERP-side roles — what a user can do within a module they can reach."
-      />
+      <Topbar title="Roles" description="ERP-side roles — what a user can do within a module they can reach." />
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
         {actionError && (
           <p className="text-sm text-signal-red bg-signal-red/10 border border-signal-red/30 rounded-lg px-3 py-2">
@@ -123,11 +92,7 @@ export default function RolesPage() {
             New role
           </Link>
         </div>
-        <DataTable
-          columns={columns}
-          rows={roles}
-          rowKey={(r) => String(r.id)}
-        />
+        <DataTable columns={columns} rows={roles} rowKey={(r) => String(r.id)} />
       </div>
     </>
   );

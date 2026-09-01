@@ -2,74 +2,75 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Plus, CheckCircle2, Truck } from "lucide-react";
+import { Plus, CheckCircle2, PackageCheck } from "lucide-react";
 import { Topbar } from "@/components/layout/Topbar";
 import { DataTable, Column } from "@/components/ui/DataTable";
 import { Badge } from "@/components/ui/Badge";
 import { api, describeApiError } from "@/lib/api";
-import type { SalesOrder, SalesOrderStatus } from "@/lib/types";
+import type { PurchaseOrder, PurchaseOrderStatus } from "@/lib/types";
 
-const FALLBACK_ORDERS: SalesOrder[] = [
-  { id: 1, ias_company_id: 2, order_number: "SO-1001", customer_id: 1, warehouse_id: 1, status: "DRAFT", currency: "USD", subtotal: "620.00", discount_amount: "0.00", tax_amount: "0.00", total_amount: "620.00", notes: null, created_by: 1, created_at: "2026-08-14T09:00:00.000Z", updated_at: "2026-08-14T09:00:00.000Z", customerName: "Harbor Logistics", warehouseName: "Nairobi Central" },
+const FALLBACK_ORDERS: PurchaseOrder[] = [
+  { id: 1, ias_company_id: 2, po_number: "PO-1001", supplier_id: 2, warehouse_id: 1, status: "DRAFT", order_date: "2026-08-10T00:00:00.000Z", expected_date: null, currency: "KES", subtotal: "12000.00", tax_amount: "0.00", total_amount: "12000.00", notes: null, created_by: 1, created_at: "2026-08-10T00:00:00.000Z", updated_at: "2026-08-10T00:00:00.000Z", supplierName: "Nairobi Steel Co.", warehouseName: "Nairobi Central" },
 ];
 
-const STATUS_TONE: Record<SalesOrderStatus, "neutral" | "amber" | "green" | "red"> = {
+const STATUS_TONE: Record<PurchaseOrderStatus, "neutral" | "amber" | "cyan" | "green"> = {
   DRAFT: "neutral",
-  CONFIRMED: "amber",
-  SHIPPED: "green",
-  CANCELLED: "red",
+  APPROVED: "amber",
+  PARTIALLY_RECEIVED: "cyan",
+  RECEIVED: "green",
 };
 
-export default function SalesOrdersPage() {
-  const [orders, setOrders] = useState<SalesOrder[]>(FALLBACK_ORDERS);
+export default function PurchasingPage() {
+  const [orders, setOrders] = useState<PurchaseOrder[]>(FALLBACK_ORDERS);
   const [actionError, setActionError] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<number | null>(null);
 
   function load() {
     api
-      .get<SalesOrder[]>("/sales/orders")
+      .get<PurchaseOrder[]>("/purchasing/orders")
       .then(setOrders)
       .catch(() => setOrders(FALLBACK_ORDERS));
   }
 
   useEffect(load, []);
 
-  async function confirm(id: number) {
+  async function approve(id: number) {
     setActionError(null);
     setBusyId(id);
     try {
-      await api.post(`/sales/orders/${id}/confirm`);
+      await api.post(`/purchasing/orders/${id}/approve`);
       load();
     } catch (err) {
-      setActionError(describeApiError(err, "Couldn't confirm this order."));
+      setActionError(describeApiError(err, "Couldn't approve this order."));
     } finally {
       setBusyId(null);
     }
   }
 
-  async function ship(id: number) {
+  async function receive(id: number) {
     setActionError(null);
     setBusyId(id);
     try {
-      await api.post(`/sales/orders/${id}/ship`);
+      // No items in the body = receive everything still outstanding.
+      await api.post(`/purchasing/orders/${id}/receive`, {});
       load();
     } catch (err) {
-      setActionError(describeApiError(err, "Couldn't ship this order."));
+      setActionError(describeApiError(err, "Couldn't receive this order."));
     } finally {
       setBusyId(null);
     }
   }
 
-  const columns: Column<SalesOrder>[] = [
+  const columns: Column<PurchaseOrder>[] = [
     {
-      header: "Order",
+      header: "PO",
       accessor: (o) => (
-        <Link href={`/sales/${o.id}`} className="font-mono text-signal-cyan hover:text-signal-cyan/80">
-          {o.order_number}
+        <Link href={`/purchasing/${o.id}`} className="font-mono text-ink-100 hover:text-signal-cyan">
+          {o.po_number}
         </Link>
       ),
     },
-    { header: "Customer", accessor: (o) => o.customerName ?? `Contact #${o.customer_id}` },
+    { header: "Supplier", accessor: (o) => o.supplierName ?? `Contact #${o.supplier_id}` },
     { header: "Warehouse", accessor: (o) => o.warehouseName ?? `Warehouse #${o.warehouse_id}` },
     { header: "Status", accessor: (o) => <Badge tone={STATUS_TONE[o.status]}>{o.status}</Badge> },
     {
@@ -84,33 +85,33 @@ export default function SalesOrdersPage() {
           {o.status === "DRAFT" && (
             <button
               disabled={busyId === o.id}
-              onClick={() => confirm(o.id)}
+              onClick={() => approve(o.id)}
               className="inline-flex items-center gap-1.5 text-signal-cyan hover:text-signal-cyan/80 text-xs disabled:opacity-50"
             >
               <CheckCircle2 size={13} />
-              Confirm
+              Approve
             </button>
           )}
-          {o.status === "CONFIRMED" && (
+          {(o.status === "APPROVED" || o.status === "PARTIALLY_RECEIVED") && (
             <button
               disabled={busyId === o.id}
-              onClick={() => ship(o.id)}
+              onClick={() => receive(o.id)}
               className="inline-flex items-center gap-1.5 text-signal-green hover:text-signal-green/80 text-xs disabled:opacity-50"
             >
-              <Truck size={13} />
-              Ship
+              <PackageCheck size={13} />
+              Receive
             </button>
           )}
         </div>
       ),
       align: "right",
-      width: "120px",
+      width: "160px",
     },
   ];
 
   return (
     <>
-      <Topbar title="Sales orders" description="Draft → confirmed → shipped, backed by reserved stock." />
+      <Topbar title="Purchasing" description="Draft → approved → received, restocking your warehouses." />
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
         {actionError && (
           <p className="text-sm text-signal-red bg-signal-red/10 border border-signal-red/30 rounded-lg px-3 py-2">
@@ -119,11 +120,11 @@ export default function SalesOrdersPage() {
         )}
         <div className="flex justify-end">
           <Link
-            href="/sales/new"
+            href="/purchasing/new"
             className="inline-flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium bg-signal-cyan text-base-950 hover:bg-signal-cyan/90 transition-colors"
           >
             <Plus size={15} />
-            New order
+            New purchase order
           </Link>
         </div>
         <DataTable columns={columns} rows={orders} rowKey={(o) => String(o.id)} />

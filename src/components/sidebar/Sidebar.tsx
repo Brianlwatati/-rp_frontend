@@ -6,7 +6,10 @@ import {
   Building2,
   Boxes,
   ClipboardList,
+  Truck,
   Contact,
+  Receipt,
+  Users2,
   Settings,
   LogOut,
   X,
@@ -20,7 +23,13 @@ const PRIMARY_NAV = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/inventory", label: "Inventory", icon: Boxes },
   { href: "/sales", label: "Sales", icon: ClipboardList },
+  { href: "/purchasing", label: "Purchasing", icon: Truck },
   { href: "/contacts", label: "Contacts", icon: Contact },
+];
+
+const FINANCE_HR_NAV = [
+  { href: "/finance", label: "Finance", icon: Receipt },
+  { href: "/hr", label: "HR", icon: Users2 },
 ];
 
 const ACCESS_NAV = [
@@ -41,6 +50,15 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
           <p className="label-eyebrow px-3 mb-2">Operations</p>
           <div className="space-y-0.5">
             {PRIMARY_NAV.map((item) => (
+              <NavItem key={item.href} {...item} onNavigate={onNavigate} />
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <p className="label-eyebrow px-3 mb-2">Finance &amp; HR</p>
+          <div className="space-y-0.5">
+            {FINANCE_HR_NAV.map((item) => (
               <NavItem key={item.href} {...item} onNavigate={onNavigate} />
             ))}
           </div>
@@ -101,14 +119,14 @@ export function Sidebar() {
   return (
     <>
       {/* Desktop rail */}
-      <aside className="hidden md:flex w-64 shrink-0 flex-col border-r border-base-600/60 bg-base-900 px-3.5 py-4">
+      <aside className="no-print hidden md:flex w-64 shrink-0 flex-col border-r border-base-600/60 bg-base-900 px-3.5 py-4">
         <Brand />
         <SidebarBody />
       </aside>
 
       {/* Mobile backdrop */}
       <div
-        className={`md:hidden fixed inset-0 z-40 bg-black/50 transition-opacity ${
+        className={`no-print md:hidden fixed inset-0 z-40 bg-black/50 transition-opacity ${
           mobileOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         }`}
         onClick={closeMobile}
@@ -117,7 +135,7 @@ export function Sidebar() {
 
       {/* Mobile drawer */}
       <aside
-        className={`md:hidden fixed inset-y-0 left-0 z-50 w-72 max-w-[85vw] flex flex-col border-r border-base-600/60 bg-base-900 px-3.5 py-4 transition-transform duration-200 ease-out ${
+        className={`no-print md:hidden fixed inset-y-0 left-0 z-50 w-72 max-w-[85vw] flex flex-col border-r border-base-600/60 bg-base-900 px-3.5 py-4 transition-transform duration-200 ease-out ${
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         }`}
         role="dialog"
