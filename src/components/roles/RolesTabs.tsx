@@ -4,15 +4,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const TABS = [
-  { href: "/hr/employees", label: "Employees" },
-  { href: "/hr/departments", label: "Departments" },
-  { href: "/hr/job-titles", label: "Job titles" },
-  { href: "/hr/attendance", label: "Attendance" },
-  { href: "/hr/leave", label: "Leave" },
-  { href: "/hr/payroll", label: "Payroll" },
+  { href: "/roles/roles", label: "Roles" },
+  { href: "/roles/role-assignment", label: "Role assignment" },
+  { href: "/roles/permissions", label: "Erp Permissions" },
 ];
 
-export function HrTabs() {
+export function RolesTabs() {
   const pathname = usePathname();
 
   return (

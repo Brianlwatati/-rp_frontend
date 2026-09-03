@@ -8,10 +8,13 @@ import { HrTabs } from "@/components/hr/HrTabs";
 import { Field, inputClass } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { api, describeApiError } from "@/lib/api";
+import { useDepartmentLookups, useJobTitleLookups } from "@/lib/hrLookups";
 import type { Employee } from "@/lib/types";
 
 export default function NewEmployeePage() {
   const router = useRouter();
+  const departments = useDepartmentLookups();
+  const jobTitles = useJobTitleLookups();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -45,8 +48,14 @@ export default function NewEmployeePage() {
         lastName: form.lastName,
         email: form.email || undefined,
         phone: form.phone || undefined,
-        department: form.department || undefined,
-        jobTitle: form.jobTitle || undefined,
+        departmentId: form.department
+          ? departments.find((d) => d.name === form.department)?.id
+          : undefined,
+        jobTitleId: form.jobTitle
+          ? jobTitles.find((j) => j.name === form.jobTitle)?.id
+          : undefined,
+        departmentName: form.department || undefined,
+        jobTitleName: form.jobTitle || undefined,
         hireDate: form.hireDate || undefined,
         salary: Number(form.salary),
       });
@@ -118,18 +127,32 @@ export default function NewEmployeePage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <Field label="Department">
-              <input
+              <select
                 value={form.department}
                 onChange={(e) => update("department", e.target.value)}
                 className={inputClass}
-              />
+              >
+                <option value="">Select department…</option>
+                {departments.map((department) => (
+                  <option key={department.id} value={department.name}>
+                    {department.name}
+                  </option>
+                ))}
+              </select>
             </Field>
             <Field label="Job title">
-              <input
+              <select
                 value={form.jobTitle}
                 onChange={(e) => update("jobTitle", e.target.value)}
                 className={inputClass}
-              />
+              >
+                <option value="">Select job title…</option>
+                {jobTitles.map((jobTitle) => (
+                  <option key={jobTitle.id} value={jobTitle.name}>
+                    {jobTitle.name}
+                  </option>
+                ))}
+              </select>
             </Field>
           </div>
 

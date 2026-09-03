@@ -19,8 +19,10 @@ const FALLBACK_EMPLOYEES: Employee[] = [
     last_name: "Bakery",
     email: "sarahbakery@gmail.com",
     phone: null,
-    department: "Operations",
-    job_title: "HR Admin",
+    department_name: "Operations",
+    department_id: 1,
+    job_title_id: 1,
+    job_title_name: "HR Admin",
     hire_date: "2026-01-15",
     salary: "80000.00",
     status: "ACTIVE",
@@ -51,8 +53,8 @@ export default function EmployeesPage() {
         </div>
       ),
     },
-    { header: "Department", accessor: (e) => e.department ?? "—" },
-    { header: "Title", accessor: (e) => e.job_title ?? "—" },
+    { header: "Department", accessor: (e) => e.department_name ?? "—" },
+    { header: "Title", accessor: (e) => e.job_title_name ?? "—" },
     {
       header: "Salary",
       accessor: (e) => `$${Number(e.salary).toFixed(2)}`,

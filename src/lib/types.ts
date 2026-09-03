@@ -24,6 +24,23 @@ export interface AuthUser {
   isActive?: boolean;
 }
 
+export interface IasCompanyUser {
+  userId: number;
+  companyId: number;
+  email: string;
+  phone: string | null;
+  systemRoleId: number | null;
+  roleName: string | null;
+  roleCode: string | null;
+  firstName: string;
+  lastName: string;
+  status: "ACTIVE" | "INACTIVE";
+  emailVerifiedAt: string | null;
+  lastLoginAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface LoginTokens {
   accessToken: string;
   refreshToken: string;
@@ -182,12 +199,31 @@ export interface ErpRole {
   updatedAt: string;
 }
 
+// GET /permissions returns the full catalog; GET /roles/:id/permissions
+// returns just the subset currently granted to that role (same shape).
+export interface ErpPermission {
+  id: number;
+  module: string;
+  action: string;
+  code: string; // generated as `${module}:${action}`
+}
+
 export interface ErpBranch {
   id: number;
   iasCompanyId: number;
   name: string;
   code: string;
   status: "ACTIVE" | "INACTIVE";
+}
+
+export interface ErpRoleAssignment {
+  id: number;
+  iasUserId: number;
+  iasCompanyId: number;
+  roleId: number;
+  branchId: number | null;
+  assignedAt: string;
+  assignedBy: number | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -269,7 +305,11 @@ export interface SalesOrderItemInput {
 // Purchasing (erp_backend /purchasing)
 // ---------------------------------------------------------------------------
 
-export type PurchaseOrderStatus = "DRAFT" | "APPROVED" | "PARTIALLY_RECEIVED" | "RECEIVED";
+export type PurchaseOrderStatus =
+  | "DRAFT"
+  | "APPROVED"
+  | "PARTIALLY_RECEIVED"
+  | "RECEIVED";
 
 export interface PurchaseOrder {
   id: number;
@@ -418,14 +458,27 @@ export interface Employee {
   last_name: string;
   email: string | null;
   phone: string | null;
-  department: string | null;
-  job_title: string | null;
+  department_name: string | null;
+  department_id: number | null;
+  job_title_name: string | null;
+  job_title_id: number | null;
   hire_date: string | null;
   salary: string;
   status: "ACTIVE" | "INACTIVE";
   created_at: string;
   updated_at: string;
 }
+
+export interface HrLookup {
+  id: number;
+  name: string;
+  status?: "ACTIVE" | "INACTIVE";
+  created_at?: string;
+  updated_at?: string;
+}
+
+export type Department = HrLookup;
+export type JobTitle = HrLookup;
 
 export interface Attendance {
   id: number;

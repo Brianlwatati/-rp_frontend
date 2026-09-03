@@ -20,26 +20,40 @@ import { useAuth } from "@/context/AuthContext";
 import { useSidebar } from "@/context/SidebarContext";
 
 const PRIMARY_NAV = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/inventory", label: "Products", icon: Boxes },
-  { href: "/sales", label: "Sales", icon: ClipboardList },
-  { href: "/purchasing", label: "Purchasing", icon: Truck },
-  { href: "/contacts", label: "Contacts", icon: Contact },
+  {
+    href: "/dashboard",
+    label: "Dashboard",
+    icon: LayoutDashboard,
+    name: "reporting",
+  },
+  { href: "/inventory", label: "Inventory", icon: Boxes, name: "inventory" },
+  { href: "/sales", label: "Sales", icon: ClipboardList, name: "sales" },
+  { href: "/purchasing", label: "Purchasing", icon: Truck, name: "purchasing" },
+  { href: "/contacts", label: "Contacts", icon: Contact, name: "contacts" },
+  { href: "/finance", label: "Finance", icon: Receipt, name: "finance" },
 ];
 
-const FINANCE_HR_NAV = [
-  { href: "/finance", label: "Finance", icon: Receipt },
-  { href: "/hr", label: "HR", icon: Users2 },
-];
+const FINANCE_HR_NAV = [{ href: "/hr", label: "HR", icon: Users2, name: "hr" }];
 
 const ACCESS_NAV = [
-  { href: "/roles", label: "Roles", icon: ShieldCheck },
-  { href: "/branches", label: "Branches", icon: Building2 },
+  { href: "/roles", label: "Roles", icon: ShieldCheck, name: "access" },
+  { href: "/branches", label: "Branches", icon: Building2, name: "access" },
 ];
 
 function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
-  const { user, logout } = useAuth();
+  const { user, permissions, logout } = useAuth();
   const initials = user?.email ? user.email.slice(0, 2).toUpperCase() : "OP";
+  const hasModuleAccess = (module: string) =>
+    permissions?.some(
+      (permission) =>
+        permission.module.toLowerCase().replace(/[\s_-]/g, "") === module,
+    ) ?? false;
+
+  const primaryNav = PRIMARY_NAV.filter((item) => hasModuleAccess(item.name));
+  const financeHrNav = FINANCE_HR_NAV.filter((item) =>
+    hasModuleAccess(item.name),
+  );
+  const accessNav = ACCESS_NAV.filter((item) => hasModuleAccess(item.name));
 
   return (
     <>
@@ -49,16 +63,16 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
         <div>
           <p className="label-eyebrow px-3 mb-2">Operations</p>
           <div className="space-y-0.5">
-            {PRIMARY_NAV.map((item) => (
+            {primaryNav.map((item) => (
               <NavItem key={item.href} {...item} onNavigate={onNavigate} />
             ))}
           </div>
         </div>
 
         <div>
-          <p className="label-eyebrow px-3 mb-2">Finance &amp; HR</p>
+          <p className="label-eyebrow px-3 mb-2"> HR</p>
           <div className="space-y-0.5">
-            {FINANCE_HR_NAV.map((item) => (
+            {financeHrNav.map((item) => (
               <NavItem key={item.href} {...item} onNavigate={onNavigate} />
             ))}
           </div>
@@ -67,7 +81,7 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
         <div>
           <p className="label-eyebrow px-3 mb-2">Access</p>
           <div className="space-y-0.5">
-            {ACCESS_NAV.map((item) => (
+            {accessNav.map((item) => (
               <NavItem key={item.href} {...item} onNavigate={onNavigate} />
             ))}
           </div>

@@ -43,15 +43,15 @@ auth issued by a centralized identity service (IAS). Fully responsive
 | `/hr/attendance` | `hr` | Inline clock-in/out form (upserts by employee + date) above the ledger |
 | `/hr/leave` (+ `new`) | `hr` | Requests with inline Approve |
 | `/hr/payroll` | `hr` | Calculates a run for every active employee and shows the gross/deductions/net result — **form only**, no run-history endpoint exists |
-| `/roles` (+ `new`, `[id]/edit`) | `roles` | Code is immutable after creation |
+| `/roles` (+ `new`, `[id]/edit`) | `roles`, `permissions` | Code is immutable after creation; edit page includes a permission matrix (`GET /permissions` catalog × `GET/PUT /roles/:id/permissions`), grouped by module with a select-all-in-module checkbox |
 | `/branches` (+ `new`) | `branches` | **List + create only** — no update endpoint |
 | `/dashboard` | `reporting`, `sales` | Single call to `GET /reporting/dashboard` for the summary cards |
 
 **Not wired up** (backend modules that exist but have no frontend yet):
-`workflow`, `audit-log`, `provisioning`, `permissions`,
-`role-assignments`, `approval-limits`, `approval-delegations`, and the
-roles permission-matrix endpoint. There's also no standalone "Users"
-page — `erp_backend` doesn't own a user list (that's IAS's job).
+`workflow`, `audit-log`, `provisioning`, `permissions` (catalog only — see
+below), `role-assignments`, `approval-limits`, `approval-delegations`.
+There's also no standalone "Users" page — `erp_backend` doesn't own a user
+list (that's IAS's job).
 
 ## Getting started
 
