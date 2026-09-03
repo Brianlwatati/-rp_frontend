@@ -41,13 +41,16 @@ const ACCESS_NAV = [
 ];
 
 function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
-  const { user, permissions, logout } = useAuth();
+  const { user, isCompanyAdmin, permissions, logout } = useAuth();
   const initials = user?.email ? user.email.slice(0, 2).toUpperCase() : "OP";
   const hasModuleAccess = (module: string) =>
-    permissions?.some(
-      (permission) =>
-        permission.module.toLowerCase().replace(/[\s_-]/g, "") === module,
-    ) ?? false;
+    isCompanyAdmin ||
+    Boolean(
+      permissions?.some(
+        (permission) =>
+          permission.module.toLowerCase().replace(/[\s_-]/g, "") === module,
+      ),
+    );
 
   const primaryNav = PRIMARY_NAV.filter((item) => hasModuleAccess(item.name));
   const financeHrNav = FINANCE_HR_NAV.filter((item) =>

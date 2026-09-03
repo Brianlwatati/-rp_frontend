@@ -19,6 +19,7 @@ import type { ErpPermission } from "@/lib/types";
 
 interface AuthContextValue {
   user: AuthUser | null;
+  isCompanyAdmin: boolean;
   permissions: ErpPermission[] | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
@@ -70,7 +71,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [router]);
 
   return (
-    <AuthContext.Provider value={{ user, permissions, loading, login, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isCompanyAdmin: user?.roleCode === "COMPANY_ADMIN",
+        permissions,
+        loading,
+        login,
+        logout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

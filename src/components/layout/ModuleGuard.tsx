@@ -28,10 +28,11 @@ function normalizeModule(module: string) {
 export function ModuleGuard({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, permissions, loading } = useAuth();
+  const { user, isCompanyAdmin, permissions, loading } = useAuth();
   const module = moduleFromPath(pathname);
   const canAccess =
     !module ||
+    isCompanyAdmin ||
     permissions?.some(
       (permission) => normalizeModule(permission.module) === module,
     );
