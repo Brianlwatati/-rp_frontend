@@ -429,6 +429,40 @@ export interface Payment {
   created_at: string;
 }
 
+export type SupplierBillStatus = "OPEN" | "PARTIALLY_PAID" | "PAID" | "VOID";
+
+export interface SupplierBill {
+  id: number;
+  ias_company_id: number;
+  bill_number: string;
+  supplier_id: number;
+  purchase_order_id: number | null;
+  status: SupplierBillStatus;
+  issue_date: string;
+  due_date: string | null;
+  currency: string;
+  subtotal: string;
+  tax_amount: string;
+  total_amount: string;
+  paid_amount: string;
+  outstanding: string;
+  notes: string | null;
+  supplierName?: string;
+}
+
+export interface SupplierPayment {
+  id: number;
+  ias_company_id: number;
+  supplier_id: number | null;
+  payment_reference: string;
+  amount: string;
+  payment_date: string;
+  method: string;
+  notes: string | null;
+  created_by: number;
+  created_at: string;
+}
+
 export interface JournalLineInput {
   accountCode: string;
   debit?: number;

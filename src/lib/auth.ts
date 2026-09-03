@@ -28,7 +28,7 @@ export async function fetchRolePermissions(
   user: AuthUser,
 ): Promise<ErpPermission[]> {
   if (!user.roleId) return [];
-  return erpApi.get<ErpPermission[]>(`/permissions`);
+  return erpApi.get<ErpPermission[]>(`/permissions/userpermissions`);
 }
 
 export function logout() {

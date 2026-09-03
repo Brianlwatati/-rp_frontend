@@ -3,14 +3,20 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, CheckCircle2, PackageCheck } from "lucide-react";
+import { ArrowLeft, CheckCircle2, FileText, PackageCheck } from "lucide-react";
 import { Topbar } from "@/components/layout/Topbar";
 import { Button } from "@/components/ui/Button";
-import { ReceiptDocument, ReceiptLine } from "@/components/receipts/ReceiptDocument";
+import {
+  ReceiptDocument,
+  ReceiptLine,
+} from "@/components/receipts/ReceiptDocument";
 import { api, describeApiError } from "@/lib/api";
 import type { PurchaseOrderWithItems, PurchaseOrderStatus } from "@/lib/types";
 
-const STATUS_TONE: Record<PurchaseOrderStatus, "neutral" | "amber" | "cyan" | "green"> = {
+const STATUS_TONE: Record<
+  PurchaseOrderStatus,
+  "neutral" | "amber" | "cyan" | "green"
+> = {
   DRAFT: "neutral",
   APPROVED: "amber",
   PARTIALLY_RECEIVED: "cyan",
@@ -25,6 +31,7 @@ export default function PurchaseOrderDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [billCreated, setBillCreated] = useState(false);
 
   function load() {
     api
@@ -33,7 +40,9 @@ export default function PurchaseOrderDetailPage() {
         setOrder(o);
         setError(null);
       })
-      .catch((err) => setError(describeApiError(err, "Couldn't load this purchase order.")))
+      .catch((err) =>
+        setError(describeApiError(err, "Couldn't load this purchase order.")),
+      )
       .finally(() => setLoading(false));
   }
 
@@ -65,9 +74,25 @@ export default function PurchaseOrderDetailPage() {
     }
   }
 
+  async function createBill() {
+    setBusy(true);
+    setError(null);
+    try {
+      await api.post(`/finance/supplier-bills/from-order/${params.id}`);
+      setBillCreated(true);
+    } catch (err) {
+      setError(describeApiError(err, "Could not create the supplier bill."));
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
     <>
-      <Topbar title={order ? order.po_number : "Purchase order"} description="Order detail and document." />
+      <Topbar
+        title={order ? order.po_number : "Purchase order"}
+        description="Order detail and document."
+      />
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3 no-print">
           <button
@@ -85,10 +110,21 @@ export default function PurchaseOrderDetailPage() {
                   Approve
                 </Button>
               )}
-              {(order.status === "APPROVED" || order.status === "PARTIALLY_RECEIVED") && (
+              {(order.status === "APPROVED" ||
+                order.status === "PARTIALLY_RECEIVED") && (
                 <Button disabled={busy} onClick={receive}>
                   <PackageCheck size={15} />
                   Receive remaining stock
+                </Button>
+              )}
+              {order.status === "RECEIVED" && (
+                <Button
+                  variant="secondary"
+                  disabled={busy || billCreated}
+                  onClick={createBill}
+                >
+                  <FileText size={15} />
+                  {billCreated ? "Bill created" : "Create supplier bill"}
                 </Button>
               )}
             </div>

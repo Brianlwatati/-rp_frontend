@@ -68,24 +68,26 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
             ))}
           </div>
         </div>
-
-        <div>
-          <p className="label-eyebrow px-3 mb-2"> HR</p>
-          <div className="space-y-0.5">
-            {financeHrNav.map((item) => (
-              <NavItem key={item.href} {...item} onNavigate={onNavigate} />
-            ))}
+        {financeHrNav.length > 0 && (
+          <div>
+            <p className="label-eyebrow px-3 mb-2"> HR</p>
+            <div className="space-y-0.5">
+              {financeHrNav.map((item) => (
+                <NavItem key={item.href} {...item} onNavigate={onNavigate} />
+              ))}
+            </div>
           </div>
-        </div>
-
-        <div>
-          <p className="label-eyebrow px-3 mb-2">Access</p>
-          <div className="space-y-0.5">
-            {accessNav.map((item) => (
-              <NavItem key={item.href} {...item} onNavigate={onNavigate} />
-            ))}
+        )}
+        {accessNav.length > 0 && (
+          <div>
+            <p className="label-eyebrow px-3 mb-2">Access</p>
+            <div className="space-y-0.5">
+              {accessNav.map((item) => (
+                <NavItem key={item.href} {...item} onNavigate={onNavigate} />
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </nav>
 
       <div className="border-t border-base-600/60 pt-3 mt-3">
