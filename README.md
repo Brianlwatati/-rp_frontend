@@ -28,24 +28,24 @@ auth issued by a centralized identity service (IAS). Fully responsive
 
 ## Routes ↔ backend modules
 
-| Frontend route | Backend module | Notes |
-|---|---|---|
-| `/inventory/products` (+ `new`, `[id]/edit`) | `inventory` | SKU is immutable after creation; status/archive via `PATCH` or `POST /:id/archive` |
-| `/inventory/warehouses` (+ `new`) | `inventory` | **List + create only** — no update endpoint |
-| `/inventory/stock` (+ `movements`, `transfers`, `count`) | `inventory` | Levels, valuation, low-stock; movement creation calls `POST /stock/adjust` (`RECEIVE`/`SALE`/`ADJUSTMENT` only) |
-| `/sales` (+ `new`, `[id]`) | `sales` | List + a document/receipt detail page with Confirm → Ship → **Create invoice** actions |
-| `/purchasing` (+ `new`, `[id]`) | `purchasing` | List + a document/receipt detail page with Approve → Receive actions |
-| `/contacts` (+ `new`, `[id]/edit`) | `contacts` | No `GET /contacts/:id` — edit page fetches the list and filters client-side |
-| `/finance/invoices` (+ `new`, `[id]`) | `finance` | The customer-facing **receipt**: `[id]` renders it via `ReceiptDocument`. "New" generates one from a confirmed/shipped sales order (`POST /invoices/from-order/:orderId`) |
-| `/finance/receivables` | `finance` | Open/partially-paid invoices with outstanding balance |
-| `/finance/payments/new` | `finance` | Records a payment with allocations across one or more invoices — **form only**, the backend has no `GET` for payments, so there's no history list |
-| `/hr/employees` (+ `new`) | `hr` | |
-| `/hr/attendance` | `hr` | Inline clock-in/out form (upserts by employee + date) above the ledger |
-| `/hr/leave` (+ `new`) | `hr` | Requests with inline Approve |
-| `/hr/payroll` | `hr` | Calculates a run for every active employee and shows the gross/deductions/net result — **form only**, no run-history endpoint exists |
-| `/roles` (+ `new`, `[id]/edit`) | `roles`, `permissions` | Code is immutable after creation; edit page includes a permission matrix (`GET /permissions` catalog × `GET/PUT /roles/:id/permissions`), grouped by module with a select-all-in-module checkbox |
-| `/branches` (+ `new`) | `branches` | **List + create only** — no update endpoint |
-| `/dashboard` | `reporting`, `sales` | Single call to `GET /reporting/dashboard` for the summary cards |
+| Frontend route                                           | Backend module         | Notes                                                                                                                                                                                            |
+| -------------------------------------------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `/inventory/products` (+ `new`, `[id]/edit`)             | `inventory`            | SKU is immutable after creation; status/archive via `PATCH` or `POST /:id/archive`                                                                                                               |
+| `/inventory/warehouses` (+ `new`)                        | `inventory`            | **List + create only** — no update endpoint                                                                                                                                                      |
+| `/inventory/stock` (+ `movements`, `transfers`, `count`) | `inventory`            | Levels, valuation, low-stock; movement creation calls `POST /stock/adjust` (`RECEIVE`/`SALE`/`ADJUSTMENT` only)                                                                                  |
+| `/sales` (+ `new`, `[id]`)                               | `sales`                | List + a document/receipt detail page with Confirm → Ship actions; confirmation automatically generates the customer invoice                                                                     |
+| `/purchasing` (+ `new`, `[id]`)                          | `purchasing`           | List + a document/receipt detail page with Approve → Receive actions; receiving automatically generates the supplier bill                                                                        |
+| `/contacts` (+ `new`, `[id]/edit`)                       | `contacts`             | No `GET /contacts/:id` — edit page fetches the list and filters client-side                                                                                                                      |
+| `/finance/invoices` (+ `new`, `[id]`)                    | `finance`              | The customer-facing **receipt**: `[id]` renders it via `ReceiptDocument`. "New" generates one from a confirmed/shipped sales order (`POST /invoices/from-order/:orderId`)                        |
+| `/finance/receivables`                                   | `finance`              | Open/partially-paid invoices with outstanding balance                                                                                                                                            |
+| `/finance/payments/new`                                  | `finance`              | Records a payment with allocations across one or more invoices — **form only**, the backend has no `GET` for payments, so there's no history list                                                |
+| `/hr/employees` (+ `new`)                                | `hr`                   |                                                                                                                                                                                                  |
+| `/hr/attendance`                                         | `hr`                   | Inline clock-in/out form (upserts by employee + date) above the ledger                                                                                                                           |
+| `/hr/leave` (+ `new`)                                    | `hr`                   | Requests with inline Approve                                                                                                                                                                     |
+| `/hr/payroll`                                            | `hr`                   | Calculates a run for every active employee and shows the gross/deductions/net result — **form only**, no run-history endpoint exists                                                             |
+| `/roles` (+ `new`, `[id]/edit`)                          | `roles`, `permissions` | Code is immutable after creation; edit page includes a permission matrix (`GET /permissions` catalog × `GET/PUT /roles/:id/permissions`), grouped by module with a select-all-in-module checkbox |
+| `/branches` (+ `new`)                                    | `branches`             | **List + create only** — no update endpoint                                                                                                                                                      |
+| `/dashboard`                                             | `reporting`, `sales`   | Single call to `GET /reporting/dashboard` for the summary cards                                                                                                                                  |
 
 **Not wired up** (backend modules that exist but have no frontend yet):
 `workflow`, `audit-log`, `provisioning`, `permissions` (catalog only — see

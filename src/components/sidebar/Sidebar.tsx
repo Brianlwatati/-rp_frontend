@@ -11,7 +11,6 @@ import {
   Receipt,
   Users2,
   Settings,
-  LogOut,
   X,
 } from "lucide-react";
 import { CompanyBadge } from "./CompanyBadge";
@@ -41,7 +40,7 @@ const ACCESS_NAV = [
 ];
 
 function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
-  const { user, isCompanyAdmin, permissions, logout } = useAuth();
+  const { user, isCompanyAdmin, permissions } = useAuth();
   const initials = user?.email ? user.email.slice(0, 2).toUpperCase() : "OP";
   const hasModuleAccess = (module: string) =>
     isCompanyAdmin ||
@@ -115,13 +114,6 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
               {user?.roleName ?? "Operator"}
             </p>
           </div>
-          <button
-            onClick={logout}
-            title="Sign out"
-            className="text-ink-500 hover:text-signal-red transition-colors"
-          >
-            <LogOut size={16} />
-          </button>
         </div>
       </div>
     </>

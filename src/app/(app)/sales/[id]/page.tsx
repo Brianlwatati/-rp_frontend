@@ -3,14 +3,25 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, CheckCircle2, Truck, Receipt as ReceiptIcon } from "lucide-react";
+import {
+  ArrowLeft,
+  CheckCircle2,
+  Truck,
+  Receipt as ReceiptIcon,
+} from "lucide-react";
 import { Topbar } from "@/components/layout/Topbar";
 import { Button } from "@/components/ui/Button";
-import { ReceiptDocument, ReceiptLine } from "@/components/receipts/ReceiptDocument";
+import {
+  ReceiptDocument,
+  ReceiptLine,
+} from "@/components/receipts/ReceiptDocument";
 import { api, describeApiError } from "@/lib/api";
 import type { SalesOrderWithItems, SalesOrderStatus } from "@/lib/types";
 
-const STATUS_TONE: Record<SalesOrderStatus, "neutral" | "amber" | "green" | "red"> = {
+const STATUS_TONE: Record<
+  SalesOrderStatus,
+  "neutral" | "amber" | "green" | "red"
+> = {
   DRAFT: "neutral",
   CONFIRMED: "amber",
   SHIPPED: "green",
@@ -33,7 +44,9 @@ export default function SalesOrderDetailPage() {
         setOrder(o);
         setLoadError(null);
       })
-      .catch((err) => setLoadError(describeApiError(err, "Couldn't load this order.")))
+      .catch((err) =>
+        setLoadError(describeApiError(err, "Couldn't load this order.")),
+      )
       .finally(() => setLoading(false));
   }
 
@@ -45,9 +58,15 @@ export default function SalesOrderDetailPage() {
     setBusy(true);
     try {
       await api.post(`/sales/orders/${order.id}/confirm`);
+      await api.post(`/finance/invoices/from-order/${order.id}`);
       load();
     } catch (err) {
-      setActionError(describeApiError(err, "Couldn't confirm this order."));
+      setActionError(
+        describeApiError(
+          err,
+          "Couldn't confirm this order and generate its invoice.",
+        ),
+      );
     } finally {
       setBusy(false);
     }
@@ -72,10 +91,14 @@ export default function SalesOrderDetailPage() {
     setActionError(null);
     setBusy(true);
     try {
-      const invoice = await api.post<{ id: number }>(`/finance/invoices/from-order/${order.id}`);
+      const invoice = await api.post<{ id: number }>(
+        `/finance/invoices/from-order/${order.id}`,
+      );
       router.push(`/finance/invoices/${invoice.id}`);
     } catch (err) {
-      setActionError(describeApiError(err, "Couldn't create an invoice for this order."));
+      setActionError(
+        describeApiError(err, "Couldn't create an invoice for this order."),
+      );
     } finally {
       setBusy(false);
     }
@@ -83,7 +106,10 @@ export default function SalesOrderDetailPage() {
 
   return (
     <>
-      <Topbar title={order ? order.order_number : "Sales order"} description="Order detail and receipt." />
+      <Topbar
+        title={order ? order.order_number : "Sales order"}
+        description="Order detail and receipt."
+      />
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3 no-print">
           <Link

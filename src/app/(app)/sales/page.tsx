@@ -10,10 +10,31 @@ import { api, describeApiError } from "@/lib/api";
 import type { SalesOrder, SalesOrderStatus } from "@/lib/types";
 
 const FALLBACK_ORDERS: SalesOrder[] = [
-  { id: 1, ias_company_id: 2, order_number: "SO-1001", customer_id: 1, warehouse_id: 1, status: "DRAFT", currency: "USD", subtotal: "620.00", discount_amount: "0.00", tax_amount: "0.00", total_amount: "620.00", notes: null, created_by: 1, created_at: "2026-08-14T09:00:00.000Z", updated_at: "2026-08-14T09:00:00.000Z", customerName: "Harbor Logistics", warehouseName: "Nairobi Central" },
+  {
+    id: 1,
+    ias_company_id: 2,
+    order_number: "SO-1001",
+    customer_id: 1,
+    warehouse_id: 1,
+    status: "DRAFT",
+    currency: "USD",
+    subtotal: "620.00",
+    discount_amount: "0.00",
+    tax_amount: "0.00",
+    total_amount: "620.00",
+    notes: null,
+    created_by: 1,
+    created_at: "2026-08-14T09:00:00.000Z",
+    updated_at: "2026-08-14T09:00:00.000Z",
+    customerName: "Harbor Logistics",
+    warehouseName: "Nairobi Central",
+  },
 ];
 
-const STATUS_TONE: Record<SalesOrderStatus, "neutral" | "amber" | "green" | "red"> = {
+const STATUS_TONE: Record<
+  SalesOrderStatus,
+  "neutral" | "amber" | "green" | "red"
+> = {
   DRAFT: "neutral",
   CONFIRMED: "amber",
   SHIPPED: "green",
@@ -39,9 +60,15 @@ export default function SalesOrdersPage() {
     setBusyId(id);
     try {
       await api.post(`/sales/orders/${id}/confirm`);
+      await api.post(`/finance/invoices/from-order/${id}`);
       load();
     } catch (err) {
-      setActionError(describeApiError(err, "Couldn't confirm this order."));
+      setActionError(
+        describeApiError(
+          err,
+          "Couldn't confirm this order and generate its invoice.",
+        ),
+      );
     } finally {
       setBusyId(null);
     }
@@ -64,14 +91,26 @@ export default function SalesOrdersPage() {
     {
       header: "Order",
       accessor: (o) => (
-        <Link href={`/sales/${o.id}`} className="font-mono text-signal-cyan hover:text-signal-cyan/80">
+        <Link
+          href={`/sales/${o.id}`}
+          className="font-mono text-signal-cyan hover:text-signal-cyan/80"
+        >
           {o.order_number}
         </Link>
       ),
     },
-    { header: "Customer", accessor: (o) => o.customerName ?? `Contact #${o.customer_id}` },
-    { header: "Warehouse", accessor: (o) => o.warehouseName ?? `Warehouse #${o.warehouse_id}` },
-    { header: "Status", accessor: (o) => <Badge tone={STATUS_TONE[o.status]}>{o.status}</Badge> },
+    {
+      header: "Customer",
+      accessor: (o) => o.customerName ?? `Contact #${o.customer_id}`,
+    },
+    {
+      header: "Warehouse",
+      accessor: (o) => o.warehouseName ?? `Warehouse #${o.warehouse_id}`,
+    },
+    {
+      header: "Status",
+      accessor: (o) => <Badge tone={STATUS_TONE[o.status]}>{o.status}</Badge>,
+    },
     {
       header: "Total",
       accessor: (o) => `${o.currency} ${Number(o.total_amount).toFixed(2)}`,
@@ -110,7 +149,10 @@ export default function SalesOrdersPage() {
 
   return (
     <>
-      <Topbar title="Sales orders" description="Draft → confirmed → shipped, backed by reserved stock." />
+      <Topbar
+        title="Sales orders"
+        description="Draft → confirmed → shipped, backed by reserved stock."
+      />
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
         {actionError && (
           <p className="text-sm text-signal-red bg-signal-red/10 border border-signal-red/30 rounded-lg px-3 py-2">
@@ -126,7 +168,11 @@ export default function SalesOrdersPage() {
             New order
           </Link>
         </div>
-        <DataTable columns={columns} rows={orders} rowKey={(o) => String(o.id)} />
+        <DataTable
+          columns={columns}
+          rows={orders}
+          rowKey={(o) => String(o.id)}
+        />
       </div>
     </>
   );

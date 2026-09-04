@@ -10,10 +10,32 @@ import { api, describeApiError } from "@/lib/api";
 import type { PurchaseOrder, PurchaseOrderStatus } from "@/lib/types";
 
 const FALLBACK_ORDERS: PurchaseOrder[] = [
-  { id: 1, ias_company_id: 2, po_number: "PO-1001", supplier_id: 2, warehouse_id: 1, status: "DRAFT", order_date: "2026-08-10T00:00:00.000Z", expected_date: null, currency: "KES", subtotal: "12000.00", tax_amount: "0.00", total_amount: "12000.00", notes: null, created_by: 1, created_at: "2026-08-10T00:00:00.000Z", updated_at: "2026-08-10T00:00:00.000Z", supplierName: "Nairobi Steel Co.", warehouseName: "Nairobi Central" },
+  {
+    id: 1,
+    ias_company_id: 2,
+    po_number: "PO-1001",
+    supplier_id: 2,
+    warehouse_id: 1,
+    status: "DRAFT",
+    order_date: "2026-08-10T00:00:00.000Z",
+    expected_date: null,
+    currency: "KES",
+    subtotal: "12000.00",
+    tax_amount: "0.00",
+    total_amount: "12000.00",
+    notes: null,
+    created_by: 1,
+    created_at: "2026-08-10T00:00:00.000Z",
+    updated_at: "2026-08-10T00:00:00.000Z",
+    supplierName: "Nairobi Steel Co.",
+    warehouseName: "Nairobi Central",
+  },
 ];
 
-const STATUS_TONE: Record<PurchaseOrderStatus, "neutral" | "amber" | "cyan" | "green"> = {
+const STATUS_TONE: Record<
+  PurchaseOrderStatus,
+  "neutral" | "amber" | "cyan" | "green"
+> = {
   DRAFT: "neutral",
   APPROVED: "amber",
   PARTIALLY_RECEIVED: "cyan",
@@ -52,10 +74,21 @@ export default function PurchasingPage() {
     setBusyId(id);
     try {
       // No items in the body = receive everything still outstanding.
-      await api.post(`/purchasing/orders/${id}/receive`, {});
+      const receivedOrder = await api.post<PurchaseOrder>(
+        `/purchasing/orders/${id}/receive`,
+        {},
+      );
+      if (receivedOrder.status === "RECEIVED") {
+        await api.post(`/finance/supplier-bills/from-order/${id}`);
+      }
       load();
     } catch (err) {
-      setActionError(describeApiError(err, "Couldn't receive this order."));
+      setActionError(
+        describeApiError(
+          err,
+          "Couldn't receive this order and generate its supplier bill.",
+        ),
+      );
     } finally {
       setBusyId(null);
     }
@@ -65,14 +98,26 @@ export default function PurchasingPage() {
     {
       header: "PO",
       accessor: (o) => (
-        <Link href={`/purchasing/${o.id}`} className="font-mono text-ink-100 hover:text-signal-cyan">
+        <Link
+          href={`/purchasing/${o.id}`}
+          className="font-mono text-ink-100 hover:text-signal-cyan"
+        >
           {o.po_number}
         </Link>
       ),
     },
-    { header: "Supplier", accessor: (o) => o.supplierName ?? `Contact #${o.supplier_id}` },
-    { header: "Warehouse", accessor: (o) => o.warehouseName ?? `Warehouse #${o.warehouse_id}` },
-    { header: "Status", accessor: (o) => <Badge tone={STATUS_TONE[o.status]}>{o.status}</Badge> },
+    {
+      header: "Supplier",
+      accessor: (o) => o.supplierName ?? `Contact #${o.supplier_id}`,
+    },
+    {
+      header: "Warehouse",
+      accessor: (o) => o.warehouseName ?? `Warehouse #${o.warehouse_id}`,
+    },
+    {
+      header: "Status",
+      accessor: (o) => <Badge tone={STATUS_TONE[o.status]}>{o.status}</Badge>,
+    },
     {
       header: "Total",
       accessor: (o) => `${o.currency} ${Number(o.total_amount).toFixed(2)}`,
@@ -111,7 +156,10 @@ export default function PurchasingPage() {
 
   return (
     <>
-      <Topbar title="Purchasing" description="Draft → approved → received, restocking your warehouses." />
+      <Topbar
+        title="Purchasing"
+        description="Draft → approved → received, restocking your warehouses."
+      />
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
         {actionError && (
           <p className="text-sm text-signal-red bg-signal-red/10 border border-signal-red/30 rounded-lg px-3 py-2">
@@ -127,7 +175,11 @@ export default function PurchasingPage() {
             New purchase order
           </Link>
         </div>
-        <DataTable columns={columns} rows={orders} rowKey={(o) => String(o.id)} />
+        <DataTable
+          columns={columns}
+          rows={orders}
+          rowKey={(o) => String(o.id)}
+        />
       </div>
     </>
   );

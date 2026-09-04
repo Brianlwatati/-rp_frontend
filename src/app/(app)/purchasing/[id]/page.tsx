@@ -3,7 +3,13 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, CheckCircle2, FileText, PackageCheck } from "lucide-react";
+import {
+  ArrowLeft,
+  CheckCircle2,
+  FilePlus2,
+  FileText,
+  PackageCheck,
+} from "lucide-react";
 import { Topbar } from "@/components/layout/Topbar";
 import { Button } from "@/components/ui/Button";
 import {
@@ -65,10 +71,22 @@ export default function PurchaseOrderDetailPage() {
     setBusy(true);
     setError(null);
     try {
-      await api.post(`/purchasing/orders/${params.id}/receive`, {});
+      const receivedOrder = await api.post<PurchaseOrderWithItems>(
+        `/purchasing/orders/${params.id}/receive`,
+        {},
+      );
+      if (receivedOrder.status === "RECEIVED") {
+        await api.post(`/finance/supplier-bills/from-order/${params.id}`);
+        setBillCreated(true);
+      }
       load();
     } catch (err) {
-      setError(describeApiError(err, "Couldn't receive this order."));
+      setError(
+        describeApiError(
+          err,
+          "Couldn't receive this order and generate its supplier bill.",
+        ),
+      );
     } finally {
       setBusy(false);
     }
@@ -118,14 +136,22 @@ export default function PurchaseOrderDetailPage() {
                 </Button>
               )}
               {order.status === "RECEIVED" && (
-                <Button
-                  variant="secondary"
-                  disabled={busy || billCreated}
-                  onClick={createBill}
-                >
-                  <FileText size={15} />
-                  {billCreated ? "Bill created" : "Create supplier bill"}
-                </Button>
+                <>
+                  <Button
+                    variant="secondary"
+                    disabled={busy || billCreated}
+                    onClick={createBill}
+                  >
+                    <FileText size={15} />
+                    {billCreated ? "Bill created" : "Create supplier bill"}
+                  </Button>
+                  <Link
+                    href={`/finance/supplier-credit-notes/new?orderId=${order.id}`}
+                    className="inline-flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium bg-base-700 text-ink-100 border border-base-600 hover:border-signal-cyan transition-colors"
+                  >
+                    <FilePlus2 size={15} /> Credit note
+                  </Link>
+                </>
               )}
             </div>
           )}

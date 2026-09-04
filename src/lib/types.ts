@@ -450,6 +450,22 @@ export interface SupplierBill {
   supplierName?: string;
 }
 
+export interface SupplierBillItem {
+  id: number;
+  supplier_bill_id: number;
+  product_id: number | null;
+  product_sku: string | null;
+  product_name: string;
+  quantity: string;
+  unit_cost: string;
+  tax_rate: string;
+  line_total: string;
+}
+
+export interface SupplierBillWithItems extends SupplierBill {
+  items: SupplierBillItem[];
+}
+
 export interface SupplierPayment {
   id: number;
   ias_company_id: number;

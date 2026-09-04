@@ -21,6 +21,7 @@ export default function NewSupplierPaymentPage() {
   const [bills, setBills] = useState<SupplierBill[]>([]);
   const [supplierId, setSupplierId] = useState("");
   const [amount, setAmount] = useState("");
+  const [paymentDate, setPaymentDate] = useState("");
   const [reference, setReference] = useState("");
   const [method, setMethod] = useState("CASH");
   const [notes, setNotes] = useState("");
@@ -57,6 +58,7 @@ export default function NewSupplierPaymentPage() {
         {
           supplierId: supplierId ? Number(supplierId) : undefined,
           amount: Number(amount),
+          paymentDate: paymentDate || undefined,
           paymentReference: reference || undefined,
           method,
           notes: notes || undefined,
@@ -114,6 +116,14 @@ export default function NewSupplierPaymentPage() {
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 className={`${inputClass} font-mono`}
+              />
+            </Field>
+            <Field label="Payment date">
+              <input
+                type="date"
+                value={paymentDate}
+                onChange={(e) => setPaymentDate(e.target.value)}
+                className={inputClass}
               />
             </Field>
           </div>

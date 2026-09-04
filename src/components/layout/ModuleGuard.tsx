@@ -29,22 +29,26 @@ export function ModuleGuard({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const { user, isCompanyAdmin, permissions, loading } = useAuth();
-  const module = moduleFromPath(pathname);
+  const requiredModule = moduleFromPath(pathname);
   const canAccess =
-    !module ||
+    !requiredModule ||
     isCompanyAdmin ||
     permissions?.some(
-      (permission) => normalizeModule(permission.module) === module,
+      (permission) => normalizeModule(permission.module) === requiredModule,
     );
 
   useEffect(() => {
     if (!loading && !user)
       router.replace(`/login?next=${encodeURIComponent(pathname)}`);
-    else if (!loading && permissions && module && !canAccess)
+    else if (!loading && permissions && requiredModule && !canAccess)
       router.replace("/dashboard");
-  }, [canAccess, loading, module, pathname, permissions, router, user]);
+  }, [canAccess, loading, pathname, permissions, requiredModule, router, user]);
 
-  if (loading || (module && !permissions) || (module && !canAccess))
+  if (
+    loading ||
+    (requiredModule && !permissions) ||
+    (requiredModule && !canAccess)
+  )
     return null;
   return <>{children}</>;
 }

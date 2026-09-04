@@ -1,8 +1,9 @@
 "use client";
 
-import { Search, Bell, Menu } from "lucide-react";
+import { Search, Bell, Menu, LogOut } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { useSidebar } from "@/context/SidebarContext";
+import { useAuth } from "@/context/AuthContext";
 
 interface TopbarProps {
   title: string;
@@ -11,6 +12,7 @@ interface TopbarProps {
 
 export function Topbar({ title, description }: TopbarProps) {
   const { openMobile } = useSidebar();
+  const { logout } = useAuth();
 
   return (
     <header className="no-print flex items-center justify-between gap-3 border-b border-base-600/60 bg-base-900/60 px-4 sm:px-6 py-4 backdrop-blur">
@@ -27,7 +29,9 @@ export function Topbar({ title, description }: TopbarProps) {
             {title}
           </h1>
           {description && (
-            <p className="hidden sm:block text-sm text-ink-500 truncate">{description}</p>
+            <p className="hidden sm:block text-sm text-ink-500 truncate">
+              {description}
+            </p>
           )}
         </div>
       </div>
@@ -45,6 +49,14 @@ export function Topbar({ title, description }: TopbarProps) {
           <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-signal-amber" />
         </button>
         <ThemeToggle />
+        <button
+          onClick={logout}
+          aria-label="Sign out"
+          title="Sign out"
+          className="rounded-lg border border-base-600 bg-base-800 p-2 text-ink-300 hover:text-signal-red transition-colors"
+        >
+          <LogOut size={16} />
+        </button>
       </div>
     </header>
   );
