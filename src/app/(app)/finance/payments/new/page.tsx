@@ -128,6 +128,14 @@ export default function NewPaymentPage() {
                 className={`${inputClass} font-mono`}
               />
             </Field>
+            <Field label="Payment date">
+              <input
+                type="date"
+                value={paymentDate}
+                onChange={(e) => setPaymentDate(e.target.value)}
+                className={inputClass}
+              />
+            </Field>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">

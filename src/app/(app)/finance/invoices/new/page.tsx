@@ -18,7 +18,10 @@ export default function NewInvoicePage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    api.get<SalesOrder[]>("/sales/orders").then(setOrders).catch(() => setOrders([]));
+    api
+      .get<SalesOrder[]>("/sales/orders")
+      .then(setOrders)
+      .catch(() => setOrders([]));
   }, []);
 
   async function onSubmit(e: FormEvent) {
@@ -26,20 +29,29 @@ export default function NewInvoicePage() {
     setError(null);
     setSubmitting(true);
     try {
-      const invoice = await api.post<Invoice>(`/finance/invoices/from-order/${orderId}`);
+      const invoice = await api.post<Invoice>(
+        `/finance/invoices/from-order/${orderId}`,
+      );
       router.push(`/finance/invoices/${invoice.id}`);
     } catch (err) {
-      setError(describeApiError(err, "Couldn't generate an invoice for this order."));
+      setError(
+        describeApiError(err, "Couldn't generate an invoice for this order."),
+      );
     } finally {
       setSubmitting(false);
     }
   }
 
-  const eligible = orders.filter((o) => o.status !== "DRAFT" && o.status !== "CANCELLED");
+  const eligible = orders.filter(
+    (o) => o.status !== "DRAFT" && o.status !== "CANCELLED",
+  );
 
   return (
     <>
-      <Topbar title="New invoice" description="Generate the receipt for a confirmed sales order." />
+      <Topbar
+        title="New invoice"
+        description="Generate the receipt for a confirmed sales order."
+      />
       <FinanceTabs />
 
       <div className="flex-1 overflow-y-auto p-4 sm:p-6">
@@ -49,13 +61,19 @@ export default function NewInvoicePage() {
             required
             hint="Only CONFIRMED or SHIPPED orders without an invoice yet will succeed."
           >
-            <select required value={orderId} onChange={(e) => setOrderId(e.target.value)} className={inputClass}>
+            <select
+              required
+              value={orderId}
+              onChange={(e) => setOrderId(e.target.value)}
+              className={inputClass}
+            >
               <option value="" disabled>
                 Select an order…
               </option>
               {eligible.map((o) => (
                 <option key={o.id} value={o.id}>
-                  {o.order_number} · {o.customerName ?? `Contact #${o.customer_id}`} · {o.currency}{" "}
+                  {o.order_number} ·{" "}
+                  {o.customerName ?? `Contact #${o.customer_id}`} · {o.currency}{" "}
                   {Number(o.total_amount).toFixed(2)}
                 </option>
               ))}

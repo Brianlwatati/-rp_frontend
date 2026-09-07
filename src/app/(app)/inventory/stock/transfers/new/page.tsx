@@ -25,7 +25,10 @@ export default function NewStockTransferPage() {
     notes: "",
   });
 
-  function update<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
+  function update<K extends keyof typeof form>(
+    key: K,
+    value: (typeof form)[K],
+  ) {
     setForm((f) => ({ ...f, [key]: value }));
   }
 
@@ -49,7 +52,12 @@ export default function NewStockTransferPage() {
       });
       router.push("/inventory/stock/transfers");
     } catch (err) {
-      setError(describeApiError(err, "Couldn't create this transfer. Check the fields and try again."));
+      setError(
+        describeApiError(
+          err,
+          "Couldn't create this transfer. Check the fields and try again.",
+        ),
+      );
     } finally {
       setSubmitting(false);
     }
@@ -57,7 +65,10 @@ export default function NewStockTransferPage() {
 
   return (
     <>
-      <Topbar title="New transfer" description="Move quantity from one warehouse to another." />
+      <Topbar
+        title="New transfer"
+        description="Move quantity from one warehouse to another."
+      />
       <InventoryTabs />
 
       <div className="flex-1 overflow-y-auto p-4 sm:p-6">

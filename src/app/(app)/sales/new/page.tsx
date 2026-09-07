@@ -41,7 +41,9 @@ export default function NewSalesOrderPage() {
   }, []);
 
   function updateItem(index: number, patch: Partial<ItemRow>) {
-    setItems((rows) => rows.map((row, i) => (i === index ? { ...row, ...patch } : row)));
+    setItems((rows) =>
+      rows.map((row, i) => (i === index ? { ...row, ...patch } : row)),
+    );
   }
 
   function addItem() {
@@ -49,7 +51,9 @@ export default function NewSalesOrderPage() {
   }
 
   function removeItem(index: number) {
-    setItems((rows) => (rows.length > 1 ? rows.filter((_, i) => i !== index) : rows));
+    setItems((rows) =>
+      rows.length > 1 ? rows.filter((_, i) => i !== index) : rows,
+    );
   }
 
   async function onSubmit(e: FormEvent) {
@@ -70,7 +74,12 @@ export default function NewSalesOrderPage() {
       });
       router.push("/sales");
     } catch (err) {
-      setError(describeApiError(err, "Couldn't create this order. Check the fields and try again."));
+      setError(
+        describeApiError(
+          err,
+          "Couldn't create this order. Check the fields and try again.",
+        ),
+      );
     } finally {
       setSubmitting(false);
     }
@@ -78,7 +87,10 @@ export default function NewSalesOrderPage() {
 
   return (
     <>
-      <Topbar title="New sales order" description="Orders start as DRAFT — confirm to reserve stock." />
+      <Topbar
+        title="New sales order"
+        description="Orders start as DRAFT — confirm to reserve stock."
+      />
       <div className="flex-1 overflow-y-auto p-4 sm:p-6">
         <form onSubmit={onSubmit} className="max-w-2xl panel p-6 space-y-5">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -100,7 +112,11 @@ export default function NewSalesOrderPage() {
               </select>
             </Field>
 
-            <Field label="Warehouse" required hint="Stock is reserved from here on confirm.">
+            <Field
+              label="Warehouse"
+              required
+              hint="Stock is reserved from here on confirm."
+            >
               <select
                 required
                 value={warehouseId}
@@ -119,7 +135,10 @@ export default function NewSalesOrderPage() {
             </Field>
           </div>
 
-          <Field label="Order number" hint="Optional — auto-generated if left blank.">
+          <Field
+            label="Order number"
+            hint="Optional — auto-generated if left blank."
+          >
             <input
               value={orderNumber}
               onChange={(e) => setOrderNumber(e.target.value)}
@@ -134,12 +153,17 @@ export default function NewSalesOrderPage() {
             </p>
             <div className="space-y-3">
               {items.map((row, i) => (
-                <div key={i} className="flex flex-col sm:flex-row gap-2 sm:items-end">
+                <div
+                  key={i}
+                  className="flex flex-col sm:flex-row gap-2 sm:items-end"
+                >
                   <div className="flex-1">
                     <select
                       required
                       value={row.productId}
-                      onChange={(e) => updateItem(i, { productId: e.target.value })}
+                      onChange={(e) =>
+                        updateItem(i, { productId: e.target.value })
+                      }
                       className={inputClass}
                     >
                       <option value="" disabled>
@@ -158,7 +182,9 @@ export default function NewSalesOrderPage() {
                     min="0.01"
                     step="any"
                     value={row.quantity}
-                    onChange={(e) => updateItem(i, { quantity: e.target.value })}
+                    onChange={(e) =>
+                      updateItem(i, { quantity: e.target.value })
+                    }
                     placeholder="Qty"
                     className={`${inputClass} font-mono w-full sm:w-24`}
                   />
@@ -167,7 +193,9 @@ export default function NewSalesOrderPage() {
                     min="0"
                     step="0.01"
                     value={row.unitPrice}
-                    onChange={(e) => updateItem(i, { unitPrice: e.target.value })}
+                    onChange={(e) =>
+                      updateItem(i, { unitPrice: e.target.value })
+                    }
                     placeholder="Unit price"
                     className={`${inputClass} font-mono w-full sm:w-32`}
                   />
@@ -193,7 +221,12 @@ export default function NewSalesOrderPage() {
           </div>
 
           <Field label="Notes">
-            <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} className={inputClass} />
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              rows={2}
+              className={inputClass}
+            />
           </Field>
 
           {error && (

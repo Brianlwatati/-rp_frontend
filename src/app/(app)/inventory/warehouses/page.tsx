@@ -34,7 +34,8 @@ const FALLBACK_WAREHOUSES: Warehouse[] = [
 ];
 
 export default function WarehousesPage() {
-  const [warehouses, setWarehouses] = useState<Warehouse[]>(FALLBACK_WAREHOUSES);
+  const [warehouses, setWarehouses] =
+    useState<Warehouse[]>(FALLBACK_WAREHOUSES);
 
   useEffect(() => {
     api
@@ -53,23 +54,34 @@ export default function WarehousesPage() {
         </span>
       ),
     },
-    { header: "Code", accessor: (w) => <span className="font-mono text-xs">{w.code}</span> },
+    {
+      header: "Code",
+      accessor: (w) => <span className="font-mono text-xs">{w.code}</span>,
+    },
     { header: "Location", accessor: (w) => w.location ?? "—" },
     {
       header: "Status",
-      accessor: (w) => <Badge tone={w.status === "ACTIVE" ? "green" : "neutral"}>{w.status}</Badge>,
+      accessor: (w) => (
+        <Badge tone={w.status === "ACTIVE" ? "green" : "neutral"}>
+          {w.status}
+        </Badge>
+      ),
     },
   ];
 
   return (
     <>
-      <Topbar title="Warehouses" description="Locations stock is received into and held at." />
+      <Topbar
+        title="Warehouses"
+        description="Locations stock is received into and held at."
+      />
       <InventoryTabs />
 
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
         <div className="flex items-center justify-between gap-3">
           <p className="text-xs text-ink-500">
-            Warehouses can be created here, but aren&apos;t editable after creation.
+            Warehouses can be created here, but aren&apos;t editable after
+            creation.
           </p>
           <Link
             href="/inventory/warehouses/new"
@@ -79,7 +91,11 @@ export default function WarehousesPage() {
             New warehouse
           </Link>
         </div>
-        <DataTable columns={columns} rows={warehouses} rowKey={(w) => String(w.id)} />
+        <DataTable
+          columns={columns}
+          rows={warehouses}
+          rowKey={(w) => String(w.id)}
+        />
       </div>
     </>
   );

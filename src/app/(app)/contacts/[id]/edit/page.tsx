@@ -10,13 +10,22 @@ import { Badge } from "@/components/ui/Badge";
 import { api, describeApiError } from "@/lib/api";
 import type { Contact } from "@/lib/types";
 
-const EMPTY_FORM = { name: "", phone: "", email: "", address: "", taxId: "", creditLimit: "" };
+const EMPTY_FORM = {
+  name: "",
+  phone: "",
+  email: "",
+  address: "",
+  taxId: "",
+  creditLimit: "",
+};
 
 export default function EditContactPage() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
 
-  const [contactType, setContactType] = useState<Contact["contactType"] | null>(null);
+  const [contactType, setContactType] = useState<Contact["contactType"] | null>(
+    null,
+  );
   const [status, setStatus] = useState<Contact["status"] | null>(null);
   const [form, setForm] = useState(EMPTY_FORM);
   const [loading, setLoading] = useState(true);
@@ -46,11 +55,16 @@ export default function EditContactPage() {
           creditLimit: contact.creditLimit ?? "",
         });
       })
-      .catch((err) => setLoadError(describeApiError(err, "Couldn't load this contact.")))
+      .catch((err) =>
+        setLoadError(describeApiError(err, "Couldn't load this contact.")),
+      )
       .finally(() => setLoading(false));
   }, [params.id]);
 
-  function update<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
+  function update<K extends keyof typeof form>(
+    key: K,
+    value: (typeof form)[K],
+  ) {
     setForm((f) => ({ ...f, [key]: value }));
   }
 
@@ -78,7 +92,14 @@ export default function EditContactPage() {
 
   return (
     <>
-      <Topbar title="Edit contact" description={contactType ? `${contactType} · Contact #${params.id}` : `Contact #${params.id}`} />
+      <Topbar
+        title="Edit contact"
+        description={
+          contactType
+            ? `${contactType} · Contact #${params.id}`
+            : `Contact #${params.id}`
+        }
+      />
       <div className="flex-1 overflow-y-auto p-4 sm:p-6">
         {loading ? (
           <p className="text-sm text-ink-500">Loading contact…</p>
@@ -91,7 +112,9 @@ export default function EditContactPage() {
             {status && (
               <div className="flex items-center gap-2">
                 <span className="text-xs text-ink-500">Status</span>
-                <Badge tone={status === "ACTIVE" ? "green" : "neutral"}>{status}</Badge>
+                <Badge tone={status === "ACTIVE" ? "green" : "neutral"}>
+                  {status}
+                </Badge>
               </div>
             )}
 

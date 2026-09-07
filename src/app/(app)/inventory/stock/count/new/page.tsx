@@ -31,7 +31,10 @@ export default function NewStockCountPage() {
     notes: "",
   });
 
-  function update<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
+  function update<K extends keyof typeof form>(
+    key: K,
+    value: (typeof form)[K],
+  ) {
     setForm((f) => ({ ...f, [key]: value }));
   }
 
@@ -52,7 +55,12 @@ export default function NewStockCountPage() {
       });
       setResult(res);
     } catch (err) {
-      setError(describeApiError(err, "Couldn't record this count. Check the fields and try again."));
+      setError(
+        describeApiError(
+          err,
+          "Couldn't record this count. Check the fields and try again.",
+        ),
+      );
     } finally {
       setSubmitting(false);
     }
@@ -60,7 +68,10 @@ export default function NewStockCountPage() {
 
   return (
     <>
-      <Topbar title="Stock count" description="Reconcile a physical count against the system quantity." />
+      <Topbar
+        title="Stock count"
+        description="Reconcile a physical count against the system quantity."
+      />
       <InventoryTabs />
 
       <div className="flex-1 overflow-y-auto p-4 sm:p-6">
@@ -101,7 +112,11 @@ export default function NewStockCountPage() {
             </select>
           </Field>
 
-          <Field label="Counted quantity" required hint="What you physically counted on hand.">
+          <Field
+            label="Counted quantity"
+            required
+            hint="What you physically counted on hand."
+          >
             <input
               required
               type="number"
@@ -113,7 +128,10 @@ export default function NewStockCountPage() {
             />
           </Field>
 
-          <Field label="Notes" hint="Optional — defaults to a variance note if left blank.">
+          <Field
+            label="Notes"
+            hint="Optional — defaults to a variance note if left blank."
+          >
             <textarea
               value={form.notes}
               onChange={(e) => update("notes", e.target.value)}
@@ -131,13 +149,28 @@ export default function NewStockCountPage() {
           {result && (
             <div className="rounded-lg border border-base-600 bg-base-700/30 px-3 py-2.5 text-sm space-y-1">
               <p className="text-ink-300">
-                System had <span className="font-mono text-ink-100">{result.systemQuantity}</span>, you
-                counted <span className="font-mono text-ink-100">{result.countedQuantity}</span>.
+                System had{" "}
+                <span className="font-mono text-ink-100">
+                  {result.systemQuantity}
+                </span>
+                , you counted{" "}
+                <span className="font-mono text-ink-100">
+                  {result.countedQuantity}
+                </span>
+                .
               </p>
-              <p className={result.variance === 0 ? "text-signal-green" : "text-signal-amber"}>
+              <p
+                className={
+                  result.variance === 0
+                    ? "text-signal-green"
+                    : "text-signal-amber"
+                }
+              >
                 Variance: {result.variance > 0 ? "+" : ""}
                 {result.variance}
-                {result.variance === 0 ? " — no movement needed." : " — a STOCK_COUNT movement was recorded."}
+                {result.variance === 0
+                  ? " — no movement needed."
+                  : " — a STOCK_COUNT movement was recorded."}
               </p>
             </div>
           )}

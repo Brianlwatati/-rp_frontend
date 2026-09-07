@@ -32,7 +32,10 @@ export default function NewStockMovementPage() {
     notes: "",
   });
 
-  function update<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
+  function update<K extends keyof typeof form>(
+    key: K,
+    value: (typeof form)[K],
+  ) {
     setForm((f) => ({ ...f, [key]: value }));
   }
 
@@ -46,7 +49,9 @@ export default function NewStockMovementPage() {
       return;
     }
     if (form.reason === "RECEIVE" && !form.unitCost) {
-      setError("Unit cost is required for RECEIVE — it drives the weighted-average cost.");
+      setError(
+        "Unit cost is required for RECEIVE — it drives the weighted-average cost.",
+      );
       return;
     }
 
@@ -62,7 +67,12 @@ export default function NewStockMovementPage() {
       });
       router.push("/inventory/stock/movements");
     } catch (err) {
-      setError(describeApiError(err, "Couldn't record this movement. Check the fields and try again."));
+      setError(
+        describeApiError(
+          err,
+          "Couldn't record this movement. Check the fields and try again.",
+        ),
+      );
     } finally {
       setSubmitting(false);
     }
@@ -70,7 +80,10 @@ export default function NewStockMovementPage() {
 
   return (
     <>
-      <Topbar title="Record movement" description="Receive stock, record a sale, or make an adjustment." />
+      <Topbar
+        title="Record movement"
+        description="Receive stock, record a sale, or make an adjustment."
+      />
       <InventoryTabs />
 
       <div className="flex-1 overflow-y-auto p-4 sm:p-6">

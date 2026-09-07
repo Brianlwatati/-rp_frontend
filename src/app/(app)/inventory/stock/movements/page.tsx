@@ -12,11 +12,44 @@ import { useInventoryLookups } from "@/lib/inventoryLookups";
 import type { StockMovement, StockMovementReason } from "@/lib/types";
 
 const FALLBACK_MOVEMENTS: StockMovement[] = [
-  { id: 1, productId: 1, warehouseId: 1, quantityDelta: "20", unitCost: "42.00", reason: "RECEIVE", referenceType: null, referenceId: null, notes: "PO-1042", createdBy: 1, createdAt: "2026-08-14T09:00:00.000Z", productSku: "SKU-2201", productName: "Steel Shelving Unit", warehouseName: "Nairobi Central" },
-  { id: 2, productId: 1, warehouseId: 1, quantityDelta: "-6", unitCost: null, reason: "SALE", referenceType: "order", referenceId: 1042, notes: null, createdBy: 1, createdAt: "2026-08-13T14:30:00.000Z", productSku: "SKU-2201", productName: "Steel Shelving Unit", warehouseName: "Nairobi Central" },
+  {
+    id: 1,
+    productId: 1,
+    warehouseId: 1,
+    quantityDelta: "20",
+    unitCost: "42.00",
+    reason: "RECEIVE",
+    referenceType: null,
+    referenceId: null,
+    notes: "PO-1042",
+    createdBy: 1,
+    createdAt: "2026-08-14T09:00:00.000Z",
+    productSku: "SKU-2201",
+    productName: "Steel Shelving Unit",
+    warehouseName: "Nairobi Central",
+  },
+  {
+    id: 2,
+    productId: 1,
+    warehouseId: 1,
+    quantityDelta: "-6",
+    unitCost: null,
+    reason: "SALE",
+    referenceType: "order",
+    referenceId: 1042,
+    notes: null,
+    createdBy: 1,
+    createdAt: "2026-08-13T14:30:00.000Z",
+    productSku: "SKU-2201",
+    productName: "Steel Shelving Unit",
+    warehouseName: "Nairobi Central",
+  },
 ];
 
-const REASON_TONE: Record<StockMovementReason, "green" | "red" | "amber" | "cyan" | "neutral"> = {
+const REASON_TONE: Record<
+  StockMovementReason,
+  "green" | "red" | "amber" | "cyan" | "neutral"
+> = {
   RECEIVE: "green",
   SALE: "amber",
   ADJUSTMENT: "red",
@@ -27,7 +60,8 @@ const REASON_TONE: Record<StockMovementReason, "green" | "red" | "amber" | "cyan
 
 export default function StockMovementsPage() {
   const { productLabel, warehouseLabel } = useInventoryLookups();
-  const [movements, setMovements] = useState<StockMovement[]>(FALLBACK_MOVEMENTS);
+  const [movements, setMovements] =
+    useState<StockMovement[]>(FALLBACK_MOVEMENTS);
 
   useEffect(() => {
     // GET /inventory/stock/movements?warehouseId= — every movement for the
@@ -42,18 +76,36 @@ export default function StockMovementsPage() {
   const columns: Column<StockMovement>[] = [
     {
       header: "Date",
-      accessor: (m) => new Date(m.createdAt).toLocaleDateString(undefined, { dateStyle: "medium" }),
+      accessor: (m) =>
+        new Date(m.createdAt).toLocaleDateString(undefined, {
+          dateStyle: "medium",
+        }),
     },
     {
       header: "Product",
-      accessor: (m) => (m.productSku ? `${m.productSku} · ${m.productName}` : productLabel(m.productId)),
+      accessor: (m) =>
+        m.productSku
+          ? `${m.productSku} · ${m.productName}`
+          : productLabel(m.productId),
     },
-    { header: "Warehouse", accessor: (m) => m.warehouseName ?? warehouseLabel(m.warehouseId) },
-    { header: "Reason", accessor: (m) => <Badge tone={REASON_TONE[m.reason]}>{m.reason}</Badge> },
+    {
+      header: "Warehouse",
+      accessor: (m) => m.warehouseName ?? warehouseLabel(m.warehouseId),
+    },
+    {
+      header: "Reason",
+      accessor: (m) => <Badge tone={REASON_TONE[m.reason]}>{m.reason}</Badge>,
+    },
     {
       header: "Qty Δ",
       accessor: (m) => (
-        <span className={Number(m.quantityDelta) >= 0 ? "text-signal-green font-mono" : "text-signal-red font-mono"}>
+        <span
+          className={
+            Number(m.quantityDelta) >= 0
+              ? "text-signal-green font-mono"
+              : "text-signal-red font-mono"
+          }
+        >
           {Number(m.quantityDelta) >= 0 ? "+" : ""}
           {m.quantityDelta}
         </span>
@@ -70,7 +122,10 @@ export default function StockMovementsPage() {
 
   return (
     <>
-      <Topbar title="Stock movements" description="An immutable ledger of every quantity change." />
+      <Topbar
+        title="Stock movements"
+        description="An immutable ledger of every quantity change."
+      />
       <InventoryTabs />
 
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
@@ -90,7 +145,11 @@ export default function StockMovementsPage() {
             Record movement
           </Link>
         </div>
-        <DataTable columns={columns} rows={movements} rowKey={(m) => String(m.id)} />
+        <DataTable
+          columns={columns}
+          rows={movements}
+          rowKey={(m) => String(m.id)}
+        />
       </div>
     </>
   );

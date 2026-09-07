@@ -6,11 +6,17 @@ import Link from "next/link";
 import { ArrowLeft, CreditCard } from "lucide-react";
 import { Topbar } from "@/components/layout/Topbar";
 import { Button } from "@/components/ui/Button";
-import { ReceiptDocument, ReceiptLine } from "@/components/receipts/ReceiptDocument";
+import {
+  ReceiptDocument,
+  ReceiptLine,
+} from "@/components/receipts/ReceiptDocument";
 import { api, describeApiError } from "@/lib/api";
 import type { InvoiceWithItems, InvoiceStatus } from "@/lib/types";
 
-const STATUS_TONE: Record<InvoiceStatus, "neutral" | "amber" | "green" | "red"> = {
+const STATUS_TONE: Record<
+  InvoiceStatus,
+  "neutral" | "amber" | "green" | "red"
+> = {
   OPEN: "neutral",
   PARTIALLY_PAID: "amber",
   PAID: "green",
@@ -27,15 +33,22 @@ export default function InvoiceReceiptPage() {
     api
       .get<InvoiceWithItems>(`/finance/invoices/${params.id}`)
       .then(setInvoice)
-      .catch((err) => setError(describeApiError(err, "Couldn't load this invoice.")))
+      .catch((err) =>
+        setError(describeApiError(err, "Couldn't load this invoice.")),
+      )
       .finally(() => setLoading(false));
   }, [params.id]);
 
-  const balance = invoice ? Number(invoice.total_amount) - Number(invoice.paid_amount) : 0;
+  const balance = invoice
+    ? Number(invoice.total_amount) - Number(invoice.paid_amount)
+    : 0;
 
   return (
     <>
-      <Topbar title={invoice ? invoice.invoice_number : "Invoice"} description="Receipt for this sale." />
+      <Topbar
+        title={invoice ? invoice.invoice_number : "Invoice"}
+        description="Receipt for this sale."
+      />
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3 no-print">
           <Link
@@ -70,7 +83,9 @@ export default function InvoiceReceiptPage() {
             status={invoice.status}
             statusTone={STATUS_TONE[invoice.status]}
             partyLabel="Billed to"
-            partyName={invoice.customerName ?? `Contact #${invoice.customer_id}`}
+            partyName={
+              invoice.customerName ?? `Contact #${invoice.customer_id}`
+            }
             currency={invoice.currency}
             lines={invoice.items.map<ReceiptLine>((item) => ({
               name: item.product_name,
@@ -87,7 +102,11 @@ export default function InvoiceReceiptPage() {
               balance: balance > 0 ? balance : undefined,
             }}
             notes={invoice.notes}
-            footer={invoice.sales_order_id ? `Generated from sales order #${invoice.sales_order_id}` : undefined}
+            footer={
+              invoice.sales_order_id
+                ? `Generated from sales order #${invoice.sales_order_id}`
+                : undefined
+            }
           />
         )}
       </div>
