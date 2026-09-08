@@ -11,41 +11,6 @@ import { api } from "@/lib/api";
 import { useInventoryLookups } from "@/lib/inventoryLookups";
 import type { StockMovement, StockMovementReason } from "@/lib/types";
 
-const FALLBACK_MOVEMENTS: StockMovement[] = [
-  {
-    id: 1,
-    productId: 1,
-    warehouseId: 1,
-    quantityDelta: "20",
-    unitCost: "42.00",
-    reason: "RECEIVE",
-    referenceType: null,
-    referenceId: null,
-    notes: "PO-1042",
-    createdBy: 1,
-    createdAt: "2026-08-14T09:00:00.000Z",
-    productSku: "SKU-2201",
-    productName: "Steel Shelving Unit",
-    warehouseName: "Nairobi Central",
-  },
-  {
-    id: 2,
-    productId: 1,
-    warehouseId: 1,
-    quantityDelta: "-6",
-    unitCost: null,
-    reason: "SALE",
-    referenceType: "order",
-    referenceId: 1042,
-    notes: null,
-    createdBy: 1,
-    createdAt: "2026-08-13T14:30:00.000Z",
-    productSku: "SKU-2201",
-    productName: "Steel Shelving Unit",
-    warehouseName: "Nairobi Central",
-  },
-];
-
 const REASON_TONE: Record<
   StockMovementReason,
   "green" | "red" | "amber" | "cyan" | "neutral"
@@ -60,8 +25,7 @@ const REASON_TONE: Record<
 
 export default function StockMovementsPage() {
   const { productLabel, warehouseLabel } = useInventoryLookups();
-  const [movements, setMovements] =
-    useState<StockMovement[]>(FALLBACK_MOVEMENTS);
+  const [movements, setMovements] = useState<StockMovement[]>([]);
 
   useEffect(() => {
     // GET /inventory/stock/movements?warehouseId= — every movement for the
@@ -70,7 +34,7 @@ export default function StockMovementsPage() {
     api
       .get<StockMovement[]>("/inventory/stock/movements")
       .then(setMovements)
-      .catch(() => setMovements(FALLBACK_MOVEMENTS));
+      .catch(() => setMovements([]));
   }, []);
 
   const columns: Column<StockMovement>[] = [

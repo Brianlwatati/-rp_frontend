@@ -19,76 +19,24 @@ import type {
   LowStockItem,
 } from "@/lib/types";
 
-const FALLBACK_LEVELS: StockLevelWithDetails[] = [
-  {
-    productId: 1,
-    sku: "SKU-2201",
-    productName: "Steel Shelving Unit",
-    warehouseId: 1,
-    warehouseCode: "WH-NBO",
-    warehouseName: "Nairobi Central",
-    quantity: "84",
-    reservedQuantity: "10",
-    availableQuantity: "74",
-    averageCost: "41.50",
-    updatedAt: "2026-08-14T09:00:00.000Z",
-  },
-  {
-    productId: 2,
-    sku: "SKU-2202",
-    productName: "Pallet Wrap (Roll)",
-    warehouseId: 1,
-    warehouseCode: "WH-NBO",
-    warehouseName: "Nairobi Central",
-    quantity: "12",
-    reservedQuantity: "0",
-    availableQuantity: "12",
-    averageCost: "5.50",
-    updatedAt: "2026-08-11T00:00:00.000Z",
-  },
-];
-
-const FALLBACK_VALUATION: StockValuationRow[] = [
-  {
-    productId: 1,
-    sku: "SKU-2201",
-    name: "Steel Shelving Unit",
-    totalQuantity: "84",
-    averageCost: "41.50",
-    valuation: "3486.00",
-  },
-  {
-    productId: 2,
-    sku: "SKU-2202",
-    name: "Pallet Wrap (Roll)",
-    totalQuantity: "12",
-    averageCost: "5.50",
-    valuation: "66.00",
-  },
-];
-
-const FALLBACK_LOW_STOCK: LowStockItem[] = [];
-
 export default function StockPage() {
-  const [levels, setLevels] =
-    useState<StockLevelWithDetails[]>(FALLBACK_LEVELS);
-  const [valuation, setValuation] =
-    useState<StockValuationRow[]>(FALLBACK_VALUATION);
-  const [lowStock, setLowStock] = useState<LowStockItem[]>(FALLBACK_LOW_STOCK);
+  const [levels, setLevels] = useState<StockLevelWithDetails[]>([]);
+  const [valuation, setValuation] = useState<StockValuationRow[]>([]);
+  const [lowStock, setLowStock] = useState<LowStockItem[]>([]);
 
   useEffect(() => {
     api
       .get<StockLevelWithDetails[]>("/inventory/stock")
       .then(setLevels)
-      .catch(() => setLevels(FALLBACK_LEVELS));
+      .catch(() => setLevels([]));
     api
       .get<StockValuationRow[]>("/inventory/stock/valuation")
       .then(setValuation)
-      .catch(() => setValuation(FALLBACK_VALUATION));
+      .catch(() => setValuation([]));
     api
       .get<LowStockItem[]>("/inventory/stock/low")
       .then(setLowStock)
-      .catch(() => setLowStock(FALLBACK_LOW_STOCK));
+      .catch(() => setLowStock([]));
   }, []);
 
   const columns: Column<StockLevelWithDetails>[] = [

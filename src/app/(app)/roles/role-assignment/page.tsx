@@ -21,12 +21,10 @@ interface UserAssignments {
   [userId: number]: ErpRoleAssignment[];
 }
 
-const FALLBACK_USERS: IasCompanyUser[] = [];
-
 export default function RoleAssignmentPage() {
   const { user } = useAuth();
   const companyId = Number(user?.companyId ?? user?.company?.id);
-  const [users, setUsers] = useState<IasCompanyUser[]>(FALLBACK_USERS);
+  const [users, setUsers] = useState<IasCompanyUser[]>([]);
   const [roles, setRoles] = useState<ErpRole[]>([]);
   const [branches, setBranches] = useState<ErpBranch[]>([]);
   const [assignments, setAssignments] = useState<UserAssignments>({});

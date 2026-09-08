@@ -9,28 +9,6 @@ import { Badge } from "@/components/ui/Badge";
 import { api, describeApiError } from "@/lib/api";
 import type { SalesOrder, SalesOrderStatus } from "@/lib/types";
 
-const FALLBACK_ORDERS: SalesOrder[] = [
-  {
-    id: 1,
-    ias_company_id: 2,
-    order_number: "SO-1001",
-    customer_id: 1,
-    warehouse_id: 1,
-    status: "DRAFT",
-    currency: "USD",
-    subtotal: "620.00",
-    discount_amount: "0.00",
-    tax_amount: "0.00",
-    total_amount: "620.00",
-    notes: null,
-    created_by: 1,
-    created_at: "2026-08-14T09:00:00.000Z",
-    updated_at: "2026-08-14T09:00:00.000Z",
-    customerName: "Harbor Logistics",
-    warehouseName: "Nairobi Central",
-  },
-];
-
 const STATUS_TONE: Record<
   SalesOrderStatus,
   "neutral" | "amber" | "green" | "red"
@@ -42,7 +20,7 @@ const STATUS_TONE: Record<
 };
 
 export default function SalesOrdersPage() {
-  const [orders, setOrders] = useState<SalesOrder[]>(FALLBACK_ORDERS);
+  const [orders, setOrders] = useState<SalesOrder[]>([]);
   const [actionError, setActionError] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<number | null>(null);
 
@@ -50,7 +28,7 @@ export default function SalesOrdersPage() {
     api
       .get<SalesOrder[]>("/sales/orders")
       .then(setOrders)
-      .catch(() => setOrders(FALLBACK_ORDERS));
+      .catch(() => setOrders([]));
   }
 
   useEffect(load, []);

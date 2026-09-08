@@ -14,10 +14,8 @@ export interface HrLookupOption {
   name: string;
 }
 
-const FALLBACK: EmployeeOption[] = [{ id: 1, label: "EMP-001 · Sarah Bakery" }];
-
 export function useEmployeeLookups() {
-  const [employees, setEmployees] = useState<EmployeeOption[]>(FALLBACK);
+  const [employees, setEmployees] = useState<EmployeeOption[]>([]);
 
   useEffect(() => {
     api
@@ -30,41 +28,29 @@ export function useEmployeeLookups() {
           })),
         ),
       )
-      .catch(() => setEmployees(FALLBACK));
+      .catch(() => setEmployees([]));
   }, []);
 
   return { employees };
 }
 
-const FALLBACK_DEPARTMENTS: Department[] = [
-  { id: 1, name: "Operations" },
-  { id: 2, name: "Finance" },
-  { id: 3, name: "Human Resources" },
-];
-
-const FALLBACK_JOB_TITLES: JobTitle[] = [
-  { id: 1, name: "HR Admin" },
-  { id: 2, name: "Accountant" },
-  { id: 3, name: "Operations Manager" },
-];
-
-function useHrLookup<T extends HrLookupOption>(path: string, fallback: T[]) {
-  const [options, setOptions] = useState<T[]>(fallback);
+function useHrLookup<T extends HrLookupOption>(path: string) {
+  const [options, setOptions] = useState<T[]>([]);
 
   useEffect(() => {
     api
       .get<T[]>(path)
       .then(setOptions)
-      .catch(() => setOptions(fallback));
+      .catch(() => setOptions([]));
   }, [path]);
 
   return options;
 }
 
 export function useDepartmentLookups() {
-  return useHrLookup<Department>("/hr/departments", FALLBACK_DEPARTMENTS);
+  return useHrLookup<Department>("/hr/departments");
 }
 
 export function useJobTitleLookups() {
-  return useHrLookup<JobTitle>("/hr/job-titles", FALLBACK_JOB_TITLES);
+  return useHrLookup<JobTitle>("/hr/job-titles");
 }

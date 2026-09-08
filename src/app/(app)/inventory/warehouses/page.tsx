@@ -10,38 +10,14 @@ import { Badge } from "@/components/ui/Badge";
 import { api } from "@/lib/api";
 import type { Warehouse } from "@/lib/types";
 
-const FALLBACK_WAREHOUSES: Warehouse[] = [
-  {
-    id: 1,
-    iasCompanyId: 2,
-    code: "WH-NBO",
-    name: "Nairobi Central",
-    location: "Nairobi, KE",
-    status: "ACTIVE",
-    createdAt: "2026-01-01T00:00:00.000Z",
-    updatedAt: "2026-01-01T00:00:00.000Z",
-  },
-  {
-    id: 2,
-    iasCompanyId: 2,
-    code: "WH-MSA",
-    name: "Mombasa Port",
-    location: "Mombasa, KE",
-    status: "ACTIVE",
-    createdAt: "2026-02-14T00:00:00.000Z",
-    updatedAt: "2026-02-14T00:00:00.000Z",
-  },
-];
-
 export default function WarehousesPage() {
-  const [warehouses, setWarehouses] =
-    useState<Warehouse[]>(FALLBACK_WAREHOUSES);
+  const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
 
   useEffect(() => {
     api
       .get<Warehouse[]>("/inventory/warehouses")
       .then(setWarehouses)
-      .catch(() => setWarehouses(FALLBACK_WAREHOUSES));
+      .catch(() => setWarehouses([]));
   }, []);
 
   const columns: Column<Warehouse>[] = [

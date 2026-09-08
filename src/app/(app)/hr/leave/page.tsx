@@ -10,24 +10,6 @@ import { Badge } from "@/components/ui/Badge";
 import { api, describeApiError } from "@/lib/api";
 import type { LeaveRequest, LeaveStatus } from "@/lib/types";
 
-const FALLBACK_LEAVE: LeaveRequest[] = [
-  {
-    id: 1,
-    ias_company_id: 2,
-    employee_id: 1,
-    leave_type: "ANNUAL",
-    starts_on: "2026-09-05",
-    ends_on: "2026-09-09",
-    reason: "Family trip",
-    status: "PENDING",
-    approved_by: null,
-    created_at: "2026-08-20T00:00:00.000Z",
-    employeeNumber: "EMP-001",
-    firstName: "Sarah",
-    lastName: "Bakery",
-  },
-];
-
 const STATUS_TONE: Record<LeaveStatus, "amber" | "green" | "red"> = {
   PENDING: "amber",
   APPROVED: "green",
@@ -35,7 +17,7 @@ const STATUS_TONE: Record<LeaveStatus, "amber" | "green" | "red"> = {
 };
 
 export default function LeavePage() {
-  const [requests, setRequests] = useState<LeaveRequest[]>(FALLBACK_LEAVE);
+  const [requests, setRequests] = useState<LeaveRequest[]>([]);
   const [actionError, setActionError] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<number | null>(null);
 
@@ -43,7 +25,7 @@ export default function LeavePage() {
     api
       .get<LeaveRequest[]>("/hr/leave")
       .then(setRequests)
-      .catch(() => setRequests(FALLBACK_LEAVE));
+      .catch(() => setRequests([]));
   }
 
   useEffect(load, []);

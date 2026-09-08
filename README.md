@@ -84,8 +84,8 @@ base tables) with a handful of camelCase joined-in name fields
 (`customerName`, `supplierName`, etc.) — the types in `src/lib/types.ts`
 reflect this split rather than normalizing it away.
 
-Fallback sample data is baked into each page so the UI stays presentable
-before your backend is running — swap it out once real data is flowing.
+List views show a shared loading state while data is fetched and an empty
+state when the backend returns no records.
 
 ## Notes
 

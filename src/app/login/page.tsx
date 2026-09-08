@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { AccessBadge } from "@/components/login/AccessBadge";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { Loader } from "@/components/ui/Loader";
 
 function LoginForm() {
   const { login } = useAuth();
@@ -46,9 +47,13 @@ function LoginForm() {
         <div className="absolute inset-0 bg-grain-token opacity-40 pointer-events-none" />
         <div className="relative flex items-center gap-2">
           <div className="h-8 w-8 rounded-md bg-signal-cyan/15 border border-signal-cyan/40 flex items-center justify-center">
-            <span className="font-display font-bold text-signal-cyan text-sm">IA</span>
+            <span className="font-display font-bold text-signal-cyan text-sm">
+              IA
+            </span>
           </div>
-          <span className="font-display font-semibold tracking-tight">IAS Console</span>
+          <span className="font-display font-semibold tracking-tight">
+            IAS Console
+          </span>
         </div>
 
         <div className="relative flex flex-col gap-8 max-w-md">
@@ -77,9 +82,13 @@ function LoginForm() {
         <div className="w-full max-w-sm">
           <div className="mb-10 lg:hidden flex items-center gap-2">
             <div className="h-8 w-8 rounded-md bg-signal-cyan/15 border border-signal-cyan/40 flex items-center justify-center">
-              <span className="font-display font-bold text-signal-cyan text-sm">IA</span>
+              <span className="font-display font-bold text-signal-cyan text-sm">
+                IA
+              </span>
             </div>
-            <span className="font-display font-semibold tracking-tight">IAS Console</span>
+            <span className="font-display font-semibold tracking-tight">
+              IAS Console
+            </span>
           </div>
 
           <p className="label-eyebrow mb-2">Sign in</p>
@@ -92,7 +101,9 @@ function LoginForm() {
 
           <form onSubmit={onSubmit} className="flex flex-col gap-5">
             <label className="flex flex-col gap-1.5">
-              <span className="text-xs font-medium text-ink-300">Work email</span>
+              <span className="text-xs font-medium text-ink-300">
+                Work email
+              </span>
               <input
                 type="email"
                 required
@@ -106,8 +117,13 @@ function LoginForm() {
 
             <label className="flex flex-col gap-1.5">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-medium text-ink-300">Password</span>
-                <a href="#" className="text-xs text-signal-cyan hover:text-signal-cyan/80">
+                <span className="text-xs font-medium text-ink-300">
+                  Password
+                </span>
+                <a
+                  href="#"
+                  className="text-xs text-signal-cyan hover:text-signal-cyan/80"
+                >
                   Forgot password?
                 </a>
               </div>
@@ -138,7 +154,8 @@ function LoginForm() {
 
             {next && (
               <p className="text-xs text-ink-500 text-center">
-                You&apos;ll return to <span className="font-mono">{next}</span> after signing in.
+                You&apos;ll return to <span className="font-mono">{next}</span>{" "}
+                after signing in.
               </p>
             )}
           </form>
@@ -150,7 +167,7 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<Loader className="min-h-screen" />}>
       <LoginForm />
     </Suspense>
   );

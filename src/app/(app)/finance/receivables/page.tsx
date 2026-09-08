@@ -10,21 +10,6 @@ import { Badge } from "@/components/ui/Badge";
 import { api } from "@/lib/api";
 import type { Receivable, InvoiceStatus } from "@/lib/types";
 
-const FALLBACK_AR: Receivable[] = [
-  {
-    id: 1,
-    ias_company_id: 2,
-    invoice_number: "INV-1723800000000",
-    customer_id: 1,
-    customerName: "Harbor Logistics",
-    status: "PARTIALLY_PAID",
-    due_date: null,
-    total_amount: "620.00",
-    paid_amount: "300.00",
-    outstanding: "320.00",
-  },
-];
-
 const STATUS_TONE: Record<
   InvoiceStatus,
   "neutral" | "amber" | "green" | "red"
@@ -36,13 +21,13 @@ const STATUS_TONE: Record<
 };
 
 export default function ReceivablesPage() {
-  const [rows, setRows] = useState<Receivable[]>(FALLBACK_AR);
+  const [rows, setRows] = useState<Receivable[]>([]);
 
   useEffect(() => {
     api
       .get<Receivable[]>("/finance/receivables")
       .then(setRows)
-      .catch(() => setRows(FALLBACK_AR));
+      .catch(() => setRows([]));
   }, []);
 
   const totalOutstanding = rows.reduce(

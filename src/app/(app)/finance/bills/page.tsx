@@ -10,27 +10,6 @@ import { Badge } from "@/components/ui/Badge";
 import { api } from "@/lib/api";
 import type { InvoiceStatus, SupplierBill } from "@/lib/types";
 
-const FALLBACK_BILLS: SupplierBill[] = [
-  {
-    id: 1,
-    ias_company_id: 2,
-    bill_number: "INV-1723800000000",
-    supplier_id: 1,
-    purchase_order_id: 1,
-    status: "PARTIALLY_PAID",
-    issue_date: "2026-08-14T00:00:00.000Z",
-    due_date: null,
-    currency: "USD",
-    subtotal: "620.00",
-    tax_amount: "0.00",
-    total_amount: "620.00",
-    paid_amount: "300.00",
-    notes: null,
-    supplierName: "Harbor Logistics",
-    outstanding: "320.00",
-  },
-];
-
 const STATUS_TONE: Record<
   InvoiceStatus,
   "neutral" | "amber" | "green" | "red"
@@ -43,7 +22,7 @@ const STATUS_TONE: Record<
 
 export default function BillsPage() {
   const [status, setStatus] = useState<InvoiceStatus | "">("");
-  const [bills, setBills] = useState<SupplierBill[]>(FALLBACK_BILLS);
+  const [bills, setBills] = useState<SupplierBill[]>([]);
 
   useEffect(() => {
     api
@@ -51,7 +30,7 @@ export default function BillsPage() {
         `/finance/supplier-bills${status ? `?status=${status}` : ""}`,
       )
       .then(setBills)
-      .catch(() => setBills(FALLBACK_BILLS));
+      .catch(() => setBills([]));
   }, [status]);
 
   const columns: Column<SupplierBill>[] = [

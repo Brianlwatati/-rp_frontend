@@ -3,6 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { Loader } from "@/components/ui/Loader";
 
 const MODULE_PATHS: Record<string, string> = {
   inventory: "inventory",
@@ -49,6 +50,6 @@ export function ModuleGuard({ children }: { children: React.ReactNode }) {
     (requiredModule && !permissions) ||
     (requiredModule && !canAccess)
   )
-    return null;
+    return <Loader className="min-h-screen" />;
   return <>{children}</>;
 }

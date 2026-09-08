@@ -10,28 +10,6 @@ import { Badge } from "@/components/ui/Badge";
 import { api } from "@/lib/api";
 import type { Invoice, InvoiceStatus } from "@/lib/types";
 
-const FALLBACK_INVOICES: Invoice[] = [
-  {
-    id: 1,
-    ias_company_id: 2,
-    invoice_number: "INV-1723800000000",
-    customer_id: 1,
-    sales_order_id: 1,
-    status: "PARTIALLY_PAID",
-    issue_date: "2026-08-14T00:00:00.000Z",
-    due_date: null,
-    currency: "USD",
-    subtotal: "620.00",
-    tax_amount: "0.00",
-    total_amount: "620.00",
-    paid_amount: "300.00",
-    notes: null,
-    created_by: 1,
-    created_at: "2026-08-14T09:00:00.000Z",
-    customerName: "Harbor Logistics",
-  },
-];
-
 const STATUS_TONE: Record<
   InvoiceStatus,
   "neutral" | "amber" | "green" | "red"
@@ -44,13 +22,13 @@ const STATUS_TONE: Record<
 
 export default function InvoicesPage() {
   const [status, setStatus] = useState<InvoiceStatus | "">("");
-  const [invoices, setInvoices] = useState<Invoice[]>(FALLBACK_INVOICES);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
 
   useEffect(() => {
     api
       .get<Invoice[]>(`/finance/invoices${status ? `?status=${status}` : ""}`)
       .then(setInvoices)
-      .catch(() => setInvoices(FALLBACK_INVOICES));
+      .catch(() => setInvoices([]));
   }, [status]);
 
   const columns: Column<Invoice>[] = [

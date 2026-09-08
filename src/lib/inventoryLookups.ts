@@ -8,25 +8,9 @@ export interface LookupItem {
   label: string;
 }
 
-const FALLBACK_PRODUCTS: LookupItem[] = [
-  { id: 1, label: "SKU-2201 · Steel Shelving Unit" },
-  { id: 2, label: "SKU-2202 · Pallet Wrap (Roll)" },
-  { id: 3, label: "SKU-2203 · Barcode Scanner" },
-];
-
-const FALLBACK_WAREHOUSES: LookupItem[] = [
-  { id: 1, label: "Nairobi Central" },
-  { id: 2, label: "Mombasa Port" },
-  { id: 3, label: "Legacy Depot" },
-];
-
-// Movements/transfers/stock levels only carry productId/warehouseId — this
-// resolves them to human-readable labels for display, falling back to
-// sample data (or "#id") if the ERP backend isn't reachable yet.
 export function useInventoryLookups() {
-  const [products, setProducts] = useState<LookupItem[]>(FALLBACK_PRODUCTS);
-  const [warehouses, setWarehouses] =
-    useState<LookupItem[]>(FALLBACK_WAREHOUSES);
+  const [products, setProducts] = useState<LookupItem[]>([]);
+  const [warehouses, setWarehouses] = useState<LookupItem[]>([]);
 
   useEffect(() => {
     api
@@ -38,14 +22,14 @@ export function useInventoryLookups() {
           rows.map((p) => ({ id: p.id, label: `${p.sku} · ${p.name}` })),
         ),
       )
-      .catch(() => setProducts(FALLBACK_PRODUCTS));
+      .catch(() => setProducts([]));
 
     api
       .get<Array<{ id: number; name: string }>>("/inventory/warehouses")
       .then((rows) =>
         setWarehouses(rows.map((w) => ({ id: w.id, label: w.name }))),
       )
-      .catch(() => setWarehouses(FALLBACK_WAREHOUSES));
+      .catch(() => setWarehouses([]));
   }, []);
 
   const productLabel = (id: number) =>

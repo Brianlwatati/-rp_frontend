@@ -9,25 +9,14 @@ import { Badge } from "@/components/ui/Badge";
 import { api } from "@/lib/api";
 import type { ErpBranch } from "@/lib/types";
 
-const FALLBACK_BRANCHES: ErpBranch[] = [
-  { id: 1, iasCompanyId: 2, name: "Head Office", code: "HQ", status: "ACTIVE" },
-  {
-    id: 2,
-    iasCompanyId: 2,
-    name: "Mombasa Branch",
-    code: "MSA",
-    status: "ACTIVE",
-  },
-];
-
 export default function BranchesPage() {
-  const [branches, setBranches] = useState<ErpBranch[]>(FALLBACK_BRANCHES);
+  const [branches, setBranches] = useState<ErpBranch[]>([]);
 
   useEffect(() => {
     api
       .get<ErpBranch[]>("/branches")
       .then(setBranches)
-      .catch(() => setBranches(FALLBACK_BRANCHES));
+      .catch(() => setBranches([]));
   }, []);
 
   const columns: Column<ErpBranch>[] = [

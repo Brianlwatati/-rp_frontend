@@ -15,55 +15,6 @@ import type {
 } from "@/lib/types";
 import { useAuth } from "@/context/AuthContext";
 
-const FALLBACK_SUMMARY: DashboardSummary = {
-  salesValue: "6110.00",
-  outstandingInvoices: "320.00",
-  stockValue: "4272.00",
-  openOrders: "2",
-  openPurchaseOrders: "1",
-};
-
-const FALLBACK_ORDERS: SalesOrder[] = [
-  {
-    id: 1,
-    ias_company_id: 2,
-    order_number: "SO-1042",
-    customer_id: 1,
-    warehouse_id: 1,
-    status: "SHIPPED",
-    currency: "USD",
-    subtotal: "4820.00",
-    discount_amount: "0.00",
-    tax_amount: "0.00",
-    total_amount: "4820.00",
-    notes: null,
-    created_by: 1,
-    created_at: "2026-08-14T00:00:00.000Z",
-    updated_at: "2026-08-14T00:00:00.000Z",
-    customerName: "Harbor Logistics",
-    warehouseName: "Nairobi Central",
-  },
-  {
-    id: 2,
-    ias_company_id: 2,
-    order_number: "SO-1041",
-    customer_id: 2,
-    warehouse_id: 1,
-    status: "CONFIRMED",
-    currency: "USD",
-    subtotal: "1290.00",
-    discount_amount: "0.00",
-    tax_amount: "0.00",
-    total_amount: "1290.00",
-    notes: null,
-    created_by: 1,
-    created_at: "2026-08-13T00:00:00.000Z",
-    updated_at: "2026-08-13T00:00:00.000Z",
-    customerName: "Northwind Contacts",
-    warehouseName: "Nairobi Central",
-  },
-];
-
 const STATUS_TONE: Record<
   SalesOrderStatus,
   "neutral" | "amber" | "green" | "red"
@@ -76,18 +27,20 @@ const STATUS_TONE: Record<
 
 export default function DashboardPage() {
   const { user } = useAuth();
-  const [summary, setSummary] = useState<DashboardSummary>(FALLBACK_SUMMARY);
-  const [orders, setOrders] = useState<SalesOrder[]>(FALLBACK_ORDERS);
+  const [summary, setSummary] = useState<DashboardSummary | null>(null);
+  const [orders, setOrders] = useState<SalesOrder[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     api
       .get<DashboardSummary>("/reporting/dashboard")
       .then(setSummary)
-      .catch(() => setSummary(FALLBACK_SUMMARY));
+      .catch(() => setSummary(null));
     api
       .get<SalesOrder[]>("/sales/orders")
       .then((rows) => setOrders(rows.slice(0, 5)))
-      .catch(() => setOrders(FALLBACK_ORDERS));
+      .catch(() => setOrders([]))
+      .finally(() => setLoading(false));
   }, []);
 
   const columns: Column<SalesOrder>[] = [
@@ -127,28 +80,40 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           <StatCard
             label="Sales value"
-            value={`$${Number(summary.salesValue).toLocaleString()}`}
+            value={
+              summary ? `$${Number(summary.salesValue).toLocaleString()}` : "—"
+            }
             icon={DollarSign}
           />
           <StatCard
             label="Outstanding"
-            value={`$${Number(summary.outstandingInvoices).toLocaleString()}`}
+            value={
+              summary
+                ? `$${Number(summary.outstandingInvoices).toLocaleString()}`
+                : "—"
+            }
             icon={Receipt}
-            trend={Number(summary.outstandingInvoices) > 0 ? "down" : "flat"}
+            trend={
+              summary && Number(summary.outstandingInvoices) > 0
+                ? "down"
+                : "flat"
+            }
           />
           <StatCard
             label="Stock value"
-            value={`$${Number(summary.stockValue).toLocaleString()}`}
+            value={
+              summary ? `$${Number(summary.stockValue).toLocaleString()}` : "—"
+            }
             icon={Boxes}
           />
           <StatCard
             label="Open orders"
-            value={summary.openOrders}
+            value={summary?.openOrders ?? "—"}
             icon={ClipboardList}
           />
           <StatCard
             label="Open POs"
-            value={summary.openPurchaseOrders}
+            value={summary?.openPurchaseOrders ?? "—"}
             icon={Truck}
           />
         </div>
@@ -169,6 +134,7 @@ export default function DashboardPage() {
             columns={columns}
             rows={orders}
             rowKey={(o) => String(o.id)}
+            loading={loading}
           />
         </div>
       </div>

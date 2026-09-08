@@ -10,35 +10,14 @@ import { Badge } from "@/components/ui/Badge";
 import { api } from "@/lib/api";
 import type { Employee } from "@/lib/types";
 
-const FALLBACK_EMPLOYEES: Employee[] = [
-  {
-    id: 1,
-    ias_company_id: 2,
-    employee_number: "EMP-001",
-    first_name: "Sarah",
-    last_name: "Bakery",
-    email: "sarahbakery@gmail.com",
-    phone: null,
-    department_name: "Operations",
-    department_id: 1,
-    job_title_id: 1,
-    job_title_name: "HR Admin",
-    hire_date: "2026-01-15",
-    salary: "80000.00",
-    status: "ACTIVE",
-    created_at: "2026-01-15T00:00:00.000Z",
-    updated_at: "2026-01-15T00:00:00.000Z",
-  },
-];
-
 export default function EmployeesPage() {
-  const [employees, setEmployees] = useState<Employee[]>(FALLBACK_EMPLOYEES);
+  const [employees, setEmployees] = useState<Employee[]>([]);
 
   useEffect(() => {
     api
       .get<Employee[]>("/hr/employees")
       .then(setEmployees)
-      .catch(() => setEmployees(FALLBACK_EMPLOYEES));
+      .catch(() => setEmployees([]));
   }, []);
 
   const columns: Column<Employee>[] = [

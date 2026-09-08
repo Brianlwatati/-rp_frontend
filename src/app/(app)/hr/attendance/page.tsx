@@ -11,24 +11,9 @@ import { api, describeApiError } from "@/lib/api";
 import { useEmployeeLookups } from "@/lib/hrLookups";
 import type { Attendance } from "@/lib/types";
 
-const FALLBACK_ATTENDANCE: Attendance[] = [
-  {
-    id: 1,
-    ias_company_id: 2,
-    employee_id: 1,
-    attendance_date: "2026-08-31",
-    clock_in: "09:02",
-    clock_out: "17:15",
-    notes: null,
-    employeeNumber: "EMP-001",
-    firstName: "Sarah",
-    lastName: "Bakery",
-  },
-];
-
 export default function AttendancePage() {
   const { employees } = useEmployeeLookups();
-  const [records, setRecords] = useState<Attendance[]>(FALLBACK_ATTENDANCE);
+  const [records, setRecords] = useState<Attendance[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -41,7 +26,7 @@ export default function AttendancePage() {
     api
       .get<Attendance[]>("/hr/attendance")
       .then(setRecords)
-      .catch(() => setRecords(FALLBACK_ATTENDANCE));
+      .catch(() => setRecords([]));
   }
 
   useEffect(load, []);

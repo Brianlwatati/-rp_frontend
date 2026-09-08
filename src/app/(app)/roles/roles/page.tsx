@@ -10,38 +10,15 @@ import { api, describeApiError } from "@/lib/api";
 import type { ErpRole } from "@/lib/types";
 import { RolesTabs } from "@/components/roles/RolesTabs";
 
-const FALLBACK_ROLES: ErpRole[] = [
-  {
-    id: 1,
-    iasCompanyId: 2,
-    name: "Admin",
-    code: "ADMIN",
-    isDefault: false,
-    status: "ACTIVE",
-    createdAt: "2026-01-01T00:00:00.000Z",
-    updatedAt: "2026-01-01T00:00:00.000Z",
-  },
-  {
-    id: 2,
-    iasCompanyId: 2,
-    name: "Warehouse Operator",
-    code: "WH_OPERATOR",
-    isDefault: true,
-    status: "ACTIVE",
-    createdAt: "2026-01-01T00:00:00.000Z",
-    updatedAt: "2026-01-01T00:00:00.000Z",
-  },
-];
-
 export default function RolesPage() {
-  const [roles, setRoles] = useState<ErpRole[]>(FALLBACK_ROLES);
+  const [roles, setRoles] = useState<ErpRole[]>([]);
   const [actionError, setActionError] = useState<string | null>(null);
 
   function load() {
     api
       .get<ErpRole[]>("/roles")
       .then(setRoles)
-      .catch(() => setRoles(FALLBACK_ROLES));
+      .catch(() => setRoles([]));
   }
 
   useEffect(load, []);

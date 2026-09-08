@@ -10,66 +10,15 @@ import { Badge } from "@/components/ui/Badge";
 import { api, describeApiError } from "@/lib/api";
 import type { Product } from "@/lib/types";
 
-const FALLBACK_PRODUCTS: Product[] = [
-  {
-    id: 1,
-    iasCompanyId: 2,
-    sku: "SKU-2201",
-    name: "Steel Shelving Unit",
-    description: "Heavy-duty 5-tier shelving.",
-    unit: "unit",
-    category: "Warehouse",
-    costPrice: "42.00",
-    sellPrice: "62.00",
-    reorderLevel: "20",
-    totalAvailable: "74",
-    status: "ACTIVE",
-    createdAt: "2026-06-01T00:00:00.000Z",
-    updatedAt: "2026-08-10T00:00:00.000Z",
-  },
-  {
-    id: 2,
-    iasCompanyId: 2,
-    sku: "SKU-2202",
-    name: "Pallet Wrap (Roll)",
-    description: null,
-    unit: "roll",
-    category: "Packaging",
-    costPrice: "5.50",
-    sellPrice: "8.00",
-    reorderLevel: "25",
-    totalAvailable: "12",
-    status: "ACTIVE",
-    createdAt: "2026-06-01T00:00:00.000Z",
-    updatedAt: "2026-08-11T00:00:00.000Z",
-  },
-  {
-    id: 3,
-    iasCompanyId: 2,
-    sku: "SKU-2203",
-    name: "Barcode Scanner",
-    description: null,
-    unit: "unit",
-    category: "Equipment",
-    costPrice: "120.00",
-    sellPrice: "145.00",
-    reorderLevel: "10",
-    totalAvailable: "6",
-    status: "ARCHIVED",
-    createdAt: "2025-11-01T00:00:00.000Z",
-    updatedAt: "2026-07-01T00:00:00.000Z",
-  },
-];
-
 export default function ProductsPage() {
-  const [products, setProducts] = useState<Product[]>(FALLBACK_PRODUCTS);
+  const [products, setProducts] = useState<Product[]>([]);
   const [actionError, setActionError] = useState<string | null>(null);
 
   function load() {
     api
       .get<Product[]>("/inventory/products")
       .then(setProducts)
-      .catch(() => setProducts(FALLBACK_PRODUCTS));
+      .catch(() => setProducts([]));
   }
 
   useEffect(load, []);
@@ -85,7 +34,10 @@ export default function ProductsPage() {
   }
 
   const columns: Column<Product>[] = [
-    { header: "SKU", accessor: (p) => <span className="font-mono text-xs">{p.sku}</span> },
+    {
+      header: "SKU",
+      accessor: (p) => <span className="font-mono text-xs">{p.sku}</span>,
+    },
     {
       header: "Product",
       accessor: (p) => (
@@ -96,21 +48,35 @@ export default function ProductsPage() {
       ),
     },
     { header: "Unit", accessor: (p) => p.unit },
-    { header: "Cost", accessor: (p) => `$${Number(p.costPrice).toFixed(2)}`, align: "right" },
-    { header: "Sell", accessor: (p) => `$${Number(p.sellPrice).toFixed(2)}`, align: "right" },
+    {
+      header: "Cost",
+      accessor: (p) => `$${Number(p.costPrice).toFixed(2)}`,
+      align: "right",
+    },
+    {
+      header: "Sell",
+      accessor: (p) => `$${Number(p.sellPrice).toFixed(2)}`,
+      align: "right",
+    },
     {
       header: "Available",
       accessor: (p) => (
         <span className="flex items-center justify-end gap-2">
           {p.totalAvailable}
-          {Number(p.totalAvailable) <= Number(p.reorderLevel) && <Badge tone="red">Reorder</Badge>}
+          {Number(p.totalAvailable) <= Number(p.reorderLevel) && (
+            <Badge tone="red">Reorder</Badge>
+          )}
         </span>
       ),
       align: "right",
     },
     {
       header: "Status",
-      accessor: (p) => <Badge tone={p.status === "ACTIVE" ? "green" : "neutral"}>{p.status}</Badge>,
+      accessor: (p) => (
+        <Badge tone={p.status === "ACTIVE" ? "green" : "neutral"}>
+          {p.status}
+        </Badge>
+      ),
     },
     {
       header: "",
@@ -141,7 +107,10 @@ export default function ProductsPage() {
 
   return (
     <>
-      <Topbar title="Products" description="Every SKU tracked across your warehouses." />
+      <Topbar
+        title="Products"
+        description="Every SKU tracked across your warehouses."
+      />
       <InventoryTabs />
 
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
@@ -159,7 +128,11 @@ export default function ProductsPage() {
             New product
           </Link>
         </div>
-        <DataTable columns={columns} rows={products} rowKey={(p) => String(p.id)} />
+        <DataTable
+          columns={columns}
+          rows={products}
+          rowKey={(p) => String(p.id)}
+        />
       </div>
     </>
   );

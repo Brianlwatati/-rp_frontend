@@ -7,25 +7,15 @@ import { api, describeApiError } from "@/lib/api";
 import type { ErpPermission } from "@/lib/types";
 import { RolesTabs } from "@/components/roles/RolesTabs";
 
-const FALLBACK_ROLES: ErpPermission[] = [
-  {
-    id: 1,
-    module: "Admin",
-    code: "ADMIN",
-    action: "false",
-  },
-];
-
 export default function RolesPage() {
-  const [erpermissions, setErpPermissions] =
-    useState<ErpPermission[]>(FALLBACK_ROLES);
+  const [erpermissions, setErpPermissions] = useState<ErpPermission[]>([]);
   const [actionError, setActionError] = useState<string | null>(null);
 
   function load() {
     api
       .get<ErpPermission[]>("/permissions")
       .then(setErpPermissions)
-      .catch(() => setErpPermissions(FALLBACK_ROLES));
+      .catch(() => setErpPermissions([]));
   }
 
   useEffect(load, []);

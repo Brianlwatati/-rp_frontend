@@ -11,34 +11,15 @@ import { api } from "@/lib/api";
 import { useInventoryLookups } from "@/lib/inventoryLookups";
 import type { StockTransfer } from "@/lib/types";
 
-const FALLBACK_TRANSFERS: StockTransfer[] = [
-  {
-    id: 1,
-    iasCompanyId: 2,
-    productId: 1,
-    fromWarehouseId: 1,
-    toWarehouseId: 2,
-    quantity: "10",
-    status: "COMPLETED",
-    createdBy: 1,
-    createdAt: "2026-08-09T10:00:00.000Z",
-    productSku: "SKU-2201",
-    productName: "Steel Shelving Unit",
-    fromWarehouseName: "Nairobi Central",
-    toWarehouseName: "Mombasa Port",
-  },
-];
-
 export default function StockTransfersPage() {
   const { productLabel, warehouseLabel } = useInventoryLookups();
-  const [transfers, setTransfers] =
-    useState<StockTransfer[]>(FALLBACK_TRANSFERS);
+  const [transfers, setTransfers] = useState<StockTransfer[]>([]);
 
   useEffect(() => {
     api
       .get<StockTransfer[]>("/inventory/stock/transfers")
       .then(setTransfers)
-      .catch(() => setTransfers(FALLBACK_TRANSFERS));
+      .catch(() => setTransfers([]));
   }, []);
 
   const columns: Column<StockTransfer>[] = [

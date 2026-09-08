@@ -9,29 +9,6 @@ import { Badge } from "@/components/ui/Badge";
 import { api, describeApiError } from "@/lib/api";
 import type { PurchaseOrder, PurchaseOrderStatus } from "@/lib/types";
 
-const FALLBACK_ORDERS: PurchaseOrder[] = [
-  {
-    id: 1,
-    ias_company_id: 2,
-    po_number: "PO-1001",
-    supplier_id: 2,
-    warehouse_id: 1,
-    status: "DRAFT",
-    order_date: "2026-08-10T00:00:00.000Z",
-    expected_date: null,
-    currency: "KES",
-    subtotal: "12000.00",
-    tax_amount: "0.00",
-    total_amount: "12000.00",
-    notes: null,
-    created_by: 1,
-    created_at: "2026-08-10T00:00:00.000Z",
-    updated_at: "2026-08-10T00:00:00.000Z",
-    supplierName: "Nairobi Steel Co.",
-    warehouseName: "Nairobi Central",
-  },
-];
-
 const STATUS_TONE: Record<
   PurchaseOrderStatus,
   "neutral" | "amber" | "cyan" | "green"
@@ -43,7 +20,7 @@ const STATUS_TONE: Record<
 };
 
 export default function PurchasingPage() {
-  const [orders, setOrders] = useState<PurchaseOrder[]>(FALLBACK_ORDERS);
+  const [orders, setOrders] = useState<PurchaseOrder[]>([]);
   const [actionError, setActionError] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<number | null>(null);
 
@@ -51,7 +28,7 @@ export default function PurchasingPage() {
     api
       .get<PurchaseOrder[]>("/purchasing/orders")
       .then(setOrders)
-      .catch(() => setOrders(FALLBACK_ORDERS));
+      .catch(() => setOrders([]));
   }
 
   useEffect(load, []);
