@@ -23,7 +23,12 @@ export function useEmployeeLookups() {
     api
       .get<Employee[]>("/hr/employees")
       .then((rows) =>
-        setEmployees(rows.map((e) => ({ id: e.id, label: `${e.employee_number} · ${e.first_name} ${e.last_name}` })))
+        setEmployees(
+          rows.map((e) => ({
+            id: e.id,
+            label: `${e.employee_number} · ${e.first_name} ${e.last_name}`,
+          })),
+        ),
       )
       .catch(() => setEmployees(FALLBACK));
   }, []);

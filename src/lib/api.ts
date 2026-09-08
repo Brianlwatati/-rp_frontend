@@ -7,7 +7,8 @@ const AUTH_BASE_URL =
 // The ERP backend (erp_backend) — everything else. It listens on 4100 by
 // default (see its .env, PORT=4100) and mounts every module under /api/v1,
 // same prefix as the auth service.
-const ERP_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4100/api/v1";
+const ERP_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4100/api/v1";
 
 export const TOKEN_COOKIE = "ias_token";
 const REFRESH_TOKEN_KEY = "ias_refresh_token";
@@ -42,6 +43,13 @@ export function clearToken() {
   document.cookie = `${TOKEN_COOKIE}=; path=/; max-age=0`;
 }
 
+function handleUnauthorized() {
+  clearToken();
+  if (typeof window !== "undefined" && window.location.pathname !== "/login") {
+    window.location.replace("/login");
+  }
+}
+
 // Both services respond with { success, message, data } — and on a 4xx,
 // { success: false, message, errors } where `errors` is a zod
 // `.flatten()` shape ({ formErrors, fieldErrors }) for 422s. This unwraps
@@ -66,7 +74,7 @@ function isEnvelope(json: unknown): json is ApiEnvelope<unknown> {
 async function request<T>(
   baseUrl: string,
   path: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
 ): Promise<T> {
   const token = getToken();
 
@@ -84,6 +92,10 @@ async function request<T>(
     json = res.status === 204 ? undefined : await res.json();
   } catch {
     // response had no JSON body
+  }
+
+  if (res.status === 401) {
+    handleUnauthorized();
   }
 
   if (!res.ok) {
@@ -113,12 +125,22 @@ function createApiClient(baseUrl: string) {
   return {
     get: <T>(path: string) => request<T>(baseUrl, path, { method: "GET" }),
     post: <T>(path: string, body?: unknown) =>
-      request<T>(baseUrl, path, { method: "POST", body: body ? JSON.stringify(body) : undefined }),
+      request<T>(baseUrl, path, {
+        method: "POST",
+        body: body ? JSON.stringify(body) : undefined,
+      }),
     put: <T>(path: string, body?: unknown) =>
-      request<T>(baseUrl, path, { method: "PUT", body: body ? JSON.stringify(body) : undefined }),
+      request<T>(baseUrl, path, {
+        method: "PUT",
+        body: body ? JSON.stringify(body) : undefined,
+      }),
     patch: <T>(path: string, body?: unknown) =>
-      request<T>(baseUrl, path, { method: "PATCH", body: body ? JSON.stringify(body) : undefined }),
-    delete: <T>(path: string) => request<T>(baseUrl, path, { method: "DELETE" }),
+      request<T>(baseUrl, path, {
+        method: "PATCH",
+        body: body ? JSON.stringify(body) : undefined,
+      }),
+    delete: <T>(path: string) =>
+      request<T>(baseUrl, path, { method: "DELETE" }),
   };
 }
 
@@ -135,13 +157,18 @@ export const api = erpApi;
 // validation detail from a zod `.flatten()` payload when present (the ERP
 // backend returns a generic "Invalid input" message and puts the specifics
 // in `errors` — this surfaces them instead of hiding them).
-export function describeApiError(err: unknown, fallback = "Something went wrong. Please try again."): string {
+export function describeApiError(
+  err: unknown,
+  fallback = "Something went wrong. Please try again.",
+): string {
   if (!err || typeof err !== "object") return fallback;
   const e = err as ApiError;
   const parts: string[] = [];
   if (e.message) parts.push(e.message);
 
-  const errors = e.errors as { formErrors?: string[]; fieldErrors?: Record<string, string[]> } | undefined;
+  const errors = e.errors as
+    | { formErrors?: string[]; fieldErrors?: Record<string, string[]> }
+    | undefined;
   if (errors?.fieldErrors) {
     for (const [field, msgs] of Object.entries(errors.fieldErrors)) {
       if (msgs?.length) parts.push(`${field}: ${msgs.join(", ")}`);
