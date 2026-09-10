@@ -6,6 +6,8 @@ import { api } from "./api";
 export interface LookupItem {
   id: number;
   label: string;
+  costPrice?: string;
+  sellPrice?: string;
 }
 
 export function useInventoryLookups() {
@@ -14,12 +16,23 @@ export function useInventoryLookups() {
 
   useEffect(() => {
     api
-      .get<Array<{ id: number; sku: string; name: string }>>(
-        "/inventory/products",
-      )
+      .get<
+        Array<{
+          id: number;
+          sku: string;
+          name: string;
+          costPrice: string;
+          sellPrice: string;
+        }>
+      >("/inventory/products")
       .then((rows) =>
         setProducts(
-          rows.map((p) => ({ id: p.id, label: `${p.sku} · ${p.name}` })),
+          rows.map((p) => ({
+            id: p.id,
+            label: `${p.sku} · ${p.name}`,
+            costPrice: p.costPrice,
+            sellPrice: p.sellPrice,
+          })),
         ),
       )
       .catch(() => setProducts([]));

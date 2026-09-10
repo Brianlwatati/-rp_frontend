@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
-import { Plus, Trash2, CheckCircle2 } from "lucide-react";
+import { Trash2, CheckCircle2 } from "lucide-react";
 import { Topbar } from "@/components/layout/Topbar";
 import { FinanceTabs } from "@/components/finance/FinanceTabs";
 import { Field, inputClass } from "@/components/ui/FormField";
@@ -96,12 +96,78 @@ export default function NewPaymentPage() {
     <>
       <Topbar
         title="Record payment"
-        description="Applies against one or more open invoices."
+        description="Applies against one open invoice."
       />
       <FinanceTabs />
 
       <div className="flex-1 overflow-y-auto p-4 sm:p-6">
         <form onSubmit={onSubmit} className="max-w-2xl panel p-6 space-y-5">
+          <div>
+            <p className="text-xs font-medium text-ink-300 mb-2">
+              Apply to invoices <span className="text-signal-red">*</span>
+            </p>
+            <div className="space-y-3">
+              {allocations.map((row, i) => (
+                <div
+                  key={i}
+                  className="flex flex-col sm:flex-row gap-2 sm:items-end"
+                >
+                  <div className="flex-1">
+                    <select
+                      required
+                      value={row.invoiceId}
+                      onChange={(e) => {
+                        const invoiceId = e.target.value;
+                        const receivable = receivables.find(
+                          (r) => String(r.id) === invoiceId,
+                        );
+                        const outstanding = receivable?.outstanding ?? "";
+
+                        updateRow(i, { invoiceId, amount: outstanding });
+                        setAmount(outstanding);
+                        setCustomerId(
+                          receivable?.customer_id
+                            ? String(receivable.customer_id)
+                            : "",
+                        );
+                      }}
+                      className={inputClass}
+                    >
+                      <option value="" disabled>
+                        Select an invoice…
+                      </option>
+                      {receivables.map((r) => (
+                        <option key={r.id} value={r.id}>
+                          {r.invoice_number} ·{" "}
+                          {r.customerName ?? `#${r.customer_id}`} · $
+                          {Number(r.outstanding).toFixed(2)} due
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <input
+                    required
+                    type="number"
+                    min="0.01"
+                    step="0.01"
+                    value={row.amount}
+                    onChange={(e) => updateRow(i, { amount: e.target.value })}
+                    placeholder="Amount"
+                    className={`${inputClass} font-mono w-full sm:w-32`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeRow(i)}
+                    disabled={allocations.length === 1}
+                    className="shrink-0 rounded-lg border border-base-600 bg-base-800 p-2.5 text-ink-500 hover:text-signal-red disabled:opacity-40 transition-colors"
+                  >
+                    <Trash2 size={15} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <Field label="Customer" hint="Optional — for your own records.">
               <select
@@ -162,68 +228,6 @@ export default function NewPaymentPage() {
                 <option value="CARD">Card</option>
               </select>
             </Field>
-          </div>
-
-          <div>
-            <p className="text-xs font-medium text-ink-300 mb-2">
-              Apply to invoices <span className="text-signal-red">*</span>
-            </p>
-            <div className="space-y-3">
-              {allocations.map((row, i) => (
-                <div
-                  key={i}
-                  className="flex flex-col sm:flex-row gap-2 sm:items-end"
-                >
-                  <div className="flex-1">
-                    <select
-                      required
-                      value={row.invoiceId}
-                      onChange={(e) =>
-                        updateRow(i, { invoiceId: e.target.value })
-                      }
-                      className={inputClass}
-                    >
-                      <option value="" disabled>
-                        Select an invoice…
-                      </option>
-                      {receivables.map((r) => (
-                        <option key={r.id} value={r.id}>
-                          {r.invoice_number} ·{" "}
-                          {r.customerName ?? `#${r.customer_id}`} · $
-                          {Number(r.outstanding).toFixed(2)} due
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <input
-                    required
-                    type="number"
-                    min="0.01"
-                    step="0.01"
-                    value={row.amount}
-                    onChange={(e) => updateRow(i, { amount: e.target.value })}
-                    placeholder="Amount"
-                    className={`${inputClass} font-mono w-full sm:w-32`}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => removeRow(i)}
-                    disabled={allocations.length === 1}
-                    className="shrink-0 rounded-lg border border-base-600 bg-base-800 p-2.5 text-ink-500 hover:text-signal-red disabled:opacity-40 transition-colors"
-                  >
-                    <Trash2 size={15} />
-                  </button>
-                </div>
-              ))}
-            </div>
-            <button
-              type="button"
-              onClick={addRow}
-              className="mt-3 inline-flex items-center gap-1.5 text-sm text-signal-cyan hover:text-signal-cyan/80"
-            >
-              <Plus size={14} />
-              Add invoice
-            </button>
           </div>
 
           <Field label="Notes">

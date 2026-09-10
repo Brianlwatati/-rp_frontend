@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
-import { CheckCircle2, Plus, Trash2 } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 import { Topbar } from "@/components/layout/Topbar";
 import { FinanceTabs } from "@/components/finance/FinanceTabs";
 import { Field, inputClass } from "@/components/ui/FormField";
@@ -84,11 +84,66 @@ export default function NewSupplierPaymentPage() {
     <>
       <Topbar
         title="Pay supplier"
-        description="Apply a payment against one or more supplier bills."
+        description="Apply a payment against a supplier bill."
       />
       <FinanceTabs />
       <div className="flex-1 overflow-y-auto p-4 sm:p-6">
         <form onSubmit={onSubmit} className="max-w-2xl panel p-6 space-y-5">
+          <div>
+            <p className="text-xs font-medium text-ink-300 mb-2">
+              Apply to bill <span className="text-signal-red">*</span>
+            </p>
+            <div className="space-y-3">
+              {rows.map((row, index) => (
+                <div
+                  key={index}
+                  className="flex flex-col sm:flex-row gap-2 sm:items-end"
+                >
+                  <select
+                    required
+                    value={row.billId}
+                    onChange={(e) => {
+                      const billId = e.target.value;
+                      const bill = bills.find(
+                        (item) => String(item.id) === billId,
+                      );
+                      setSupplierId(bill ? String(bill.supplier_id) : "");
+                      setAmount(bill?.outstanding ?? "");
+                      updateRow(index, {
+                        billId,
+                        amount: bill?.outstanding ?? "",
+                      });
+                    }}
+                    className={`${inputClass} flex-1`}
+                  >
+                    <option value="" disabled>
+                      Select a bill...
+                    </option>
+                    {bills.map((bill) => (
+                      <option key={bill.id} value={bill.id}>
+                        {bill.bill_number} -{" "}
+                        {bill.supplierName ?? `#${bill.supplier_id}`} -{" "}
+                        {bill.currency} {Number(bill.outstanding).toFixed(2)}{" "}
+                        due
+                      </option>
+                    ))}
+                  </select>
+                  <input
+                    required
+                    type="number"
+                    min="0.01"
+                    step="0.01"
+                    value={row.amount}
+                    onChange={(e) =>
+                      updateRow(index, { amount: e.target.value })
+                    }
+                    placeholder="Amount"
+                    className={`${inputClass} font-mono w-full sm:w-32`}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <Field
               label="Supplier"
@@ -149,73 +204,7 @@ export default function NewSupplierPaymentPage() {
               </select>
             </Field>
           </div>
-          <div>
-            <p className="text-xs font-medium text-ink-300 mb-2">
-              Apply to bills <span className="text-signal-red">*</span>
-            </p>
-            <div className="space-y-3">
-              {rows.map((row, index) => (
-                <div
-                  key={index}
-                  className="flex flex-col sm:flex-row gap-2 sm:items-end"
-                >
-                  <select
-                    required
-                    value={row.billId}
-                    onChange={(e) =>
-                      updateRow(index, { billId: e.target.value })
-                    }
-                    className={`${inputClass} flex-1`}
-                  >
-                    <option value="" disabled>
-                      Select a bill...
-                    </option>
-                    {bills.map((bill) => (
-                      <option key={bill.id} value={bill.id}>
-                        {bill.bill_number} -{" "}
-                        {bill.supplierName ?? `#${bill.supplier_id}`} -{" "}
-                        {bill.currency} {Number(bill.outstanding).toFixed(2)}{" "}
-                        due
-                      </option>
-                    ))}
-                  </select>
-                  <input
-                    required
-                    type="number"
-                    min="0.01"
-                    step="0.01"
-                    value={row.amount}
-                    onChange={(e) =>
-                      updateRow(index, { amount: e.target.value })
-                    }
-                    placeholder="Amount"
-                    className={`${inputClass} font-mono w-full sm:w-32`}
-                  />
-                  <button
-                    type="button"
-                    disabled={rows.length === 1}
-                    onClick={() =>
-                      setRows((current) =>
-                        current.filter((_, i) => i !== index),
-                      )
-                    }
-                    className="shrink-0 rounded-lg border border-base-600 bg-base-800 p-2.5 text-ink-500 hover:text-signal-red disabled:opacity-40"
-                  >
-                    <Trash2 size={15} />
-                  </button>
-                </div>
-              ))}
-            </div>
-            <button
-              type="button"
-              onClick={() =>
-                setRows((current) => [...current, { ...EMPTY_ROW }])
-              }
-              className="mt-3 inline-flex items-center gap-1.5 text-sm text-signal-cyan"
-            >
-              <Plus size={14} /> Add bill
-            </button>
-          </div>
+
           <Field label="Notes">
             <textarea
               value={notes}

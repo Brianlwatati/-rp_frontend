@@ -41,13 +41,17 @@ export default function NewPurchaseOrderPage() {
   }, []);
 
   function updateItem(index: number, patch: Partial<ItemRow>) {
-    setItems((rows) => rows.map((row, i) => (i === index ? { ...row, ...patch } : row)));
+    setItems((rows) =>
+      rows.map((row, i) => (i === index ? { ...row, ...patch } : row)),
+    );
   }
   function addItem() {
     setItems((rows) => [...rows, { ...EMPTY_ROW }]);
   }
   function removeItem(index: number) {
-    setItems((rows) => (rows.length > 1 ? rows.filter((_, i) => i !== index) : rows));
+    setItems((rows) =>
+      rows.length > 1 ? rows.filter((_, i) => i !== index) : rows,
+    );
   }
 
   async function onSubmit(e: FormEvent) {
@@ -68,7 +72,12 @@ export default function NewPurchaseOrderPage() {
       });
       router.push("/purchasing");
     } catch (err) {
-      setError(describeApiError(err, "Couldn't create this purchase order. Check the fields and try again."));
+      setError(
+        describeApiError(
+          err,
+          "Couldn't create this purchase order. Check the fields and try again.",
+        ),
+      );
     } finally {
       setSubmitting(false);
     }
@@ -76,12 +85,20 @@ export default function NewPurchaseOrderPage() {
 
   return (
     <>
-      <Topbar title="New purchase order" description="Orders start as DRAFT — approve, then receive goods." />
+      <Topbar
+        title="New purchase order"
+        description="Orders start as DRAFT — approve, then receive goods."
+      />
       <div className="flex-1 overflow-y-auto p-4 sm:p-6">
         <form onSubmit={onSubmit} className="max-w-2xl panel p-6 space-y-5">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <Field label="Supplier" required>
-              <select required value={supplierId} onChange={(e) => setSupplierId(e.target.value)} className={inputClass}>
+              <select
+                required
+                value={supplierId}
+                onChange={(e) => setSupplierId(e.target.value)}
+                className={inputClass}
+              >
                 <option value="" disabled>
                   Select a supplier…
                 </option>
@@ -93,8 +110,17 @@ export default function NewPurchaseOrderPage() {
               </select>
             </Field>
 
-            <Field label="Warehouse" required hint="Where received stock will land.">
-              <select required value={warehouseId} onChange={(e) => setWarehouseId(e.target.value)} className={inputClass}>
+            <Field
+              label="Warehouse"
+              required
+              hint="Where received stock will land."
+            >
+              <select
+                required
+                value={warehouseId}
+                onChange={(e) => setWarehouseId(e.target.value)}
+                className={inputClass}
+              >
                 <option value="" disabled>
                   Select a warehouse…
                 </option>
@@ -107,7 +133,10 @@ export default function NewPurchaseOrderPage() {
             </Field>
           </div>
 
-          <Field label="PO number" hint="Optional — auto-generated if left blank.">
+          <Field
+            label="PO number"
+            hint="Optional — auto-generated if left blank."
+          >
             <input
               value={poNumber}
               onChange={(e) => setPoNumber(e.target.value)}
@@ -122,12 +151,24 @@ export default function NewPurchaseOrderPage() {
             </p>
             <div className="space-y-3">
               {items.map((row, i) => (
-                <div key={i} className="flex flex-col sm:flex-row gap-2 sm:items-end">
+                <div
+                  key={i}
+                  className="flex flex-col sm:flex-row gap-2 sm:items-end"
+                >
                   <div className="flex-1">
                     <select
                       required
                       value={row.productId}
-                      onChange={(e) => updateItem(i, { productId: e.target.value })}
+                      onChange={(e) => {
+                        const productId = e.target.value;
+                        const product = products.find(
+                          (p) => String(p.id) === productId,
+                        );
+                        updateItem(i, {
+                          productId,
+                          unitCost: product?.costPrice ?? "",
+                        });
+                      }}
                       className={inputClass}
                     >
                       <option value="" disabled>
@@ -146,7 +187,9 @@ export default function NewPurchaseOrderPage() {
                     min="0.01"
                     step="any"
                     value={row.quantity}
-                    onChange={(e) => updateItem(i, { quantity: e.target.value })}
+                    onChange={(e) =>
+                      updateItem(i, { quantity: e.target.value })
+                    }
                     placeholder="Qty"
                     className={`${inputClass} font-mono w-full sm:w-24`}
                   />
@@ -156,7 +199,9 @@ export default function NewPurchaseOrderPage() {
                     min="0"
                     step="0.01"
                     value={row.unitCost}
-                    onChange={(e) => updateItem(i, { unitCost: e.target.value })}
+                    onChange={(e) =>
+                      updateItem(i, { unitCost: e.target.value })
+                    }
                     placeholder="Unit cost"
                     className={`${inputClass} font-mono w-full sm:w-32`}
                   />
@@ -182,7 +227,12 @@ export default function NewPurchaseOrderPage() {
           </div>
 
           <Field label="Notes">
-            <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} className={inputClass} />
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              rows={2}
+              className={inputClass}
+            />
           </Field>
 
           {error && (

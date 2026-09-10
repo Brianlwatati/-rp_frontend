@@ -161,9 +161,15 @@ export default function NewSalesOrderPage() {
                     <select
                       required
                       value={row.productId}
-                      onChange={(e) =>
-                        updateItem(i, { productId: e.target.value })
-                      }
+                      onChange={(e) => {
+                        const product = products.find(
+                          (p) => String(p.id) === e.target.value,
+                        );
+                        updateItem(i, {
+                          productId: e.target.value,
+                          unitPrice: product?.sellPrice ?? "",
+                        });
+                      }}
                       className={inputClass}
                     >
                       <option value="" disabled>
