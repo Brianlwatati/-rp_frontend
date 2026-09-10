@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { DollarSign, Receipt, Boxes, ClipboardList, Truck } from "lucide-react";
+import { Receipt, Boxes, ClipboardList, Truck, HandCoins } from "lucide-react";
 import { Topbar } from "@/components/layout/Topbar";
 import { StatCard } from "@/components/ui/StatCard";
 import { DataTable, Column } from "@/components/ui/DataTable";
@@ -81,15 +81,17 @@ export default function DashboardPage() {
           <StatCard
             label="Sales value"
             value={
-              summary ? `$${Number(summary.salesValue).toLocaleString()}` : "—"
+              summary
+                ? `KES. ${Number(summary.salesValue).toLocaleString()}`
+                : "—"
             }
-            icon={DollarSign}
+            icon={HandCoins}
           />
           <StatCard
             label="Outstanding"
             value={
               summary
-                ? `$${Number(summary.outstandingInvoices).toLocaleString()}`
+                ? `KES. ${Number(summary.outstandingInvoices).toLocaleString()}`
                 : "—"
             }
             icon={Receipt}
@@ -102,7 +104,9 @@ export default function DashboardPage() {
           <StatCard
             label="Stock value"
             value={
-              summary ? `$${Number(summary.stockValue).toLocaleString()}` : "—"
+              summary
+                ? `KES. ${Number(summary.stockValue).toLocaleString()}`
+                : "—"
             }
             icon={Boxes}
           />

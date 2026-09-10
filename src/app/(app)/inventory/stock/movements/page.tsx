@@ -78,7 +78,8 @@ export default function StockMovementsPage() {
     },
     {
       header: "Unit cost",
-      accessor: (m) => (m.unitCost ? `$${Number(m.unitCost).toFixed(2)}` : "—"),
+      accessor: (m) =>
+        m.unitCost ? `KES. ${Number(m.unitCost).toFixed(2)}` : "—",
       align: "right",
     },
     { header: "Notes", accessor: (m) => m.notes ?? "—" },

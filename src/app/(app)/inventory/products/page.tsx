@@ -50,12 +50,12 @@ export default function ProductsPage() {
     { header: "Unit", accessor: (p) => p.unit },
     {
       header: "Cost",
-      accessor: (p) => `$${Number(p.costPrice).toFixed(2)}`,
+      accessor: (p) => `KES. ${Number(p.costPrice).toFixed(2)}`,
       align: "right",
     },
     {
       header: "Sell",
-      accessor: (p) => `$${Number(p.sellPrice).toFixed(2)}`,
+      accessor: (p) => `KES. ${Number(p.sellPrice).toFixed(2)}`,
       align: "right",
     },
     {

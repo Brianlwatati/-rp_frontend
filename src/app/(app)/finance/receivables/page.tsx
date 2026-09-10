@@ -62,7 +62,7 @@ export default function ReceivablesPage() {
     },
     {
       header: "Outstanding",
-      accessor: (r) => `$${Number(r.outstanding).toFixed(2)}`,
+      accessor: (r) => `KES. ${Number(r.outstanding).toFixed(2)}`,
       align: "right",
     },
   ];
@@ -80,7 +80,7 @@ export default function ReceivablesPage() {
           <p className="text-sm text-ink-500">
             Total outstanding{" "}
             <span className="text-ink-100 font-mono">
-              ${totalOutstanding.toFixed(2)}
+              KES.{totalOutstanding.toFixed(2)}
             </span>
           </p>
           <Link

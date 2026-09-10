@@ -62,7 +62,7 @@ export default function StockPage() {
     },
     {
       header: "Avg cost",
-      accessor: (s) => `$${Number(s.averageCost).toFixed(2)}`,
+      accessor: (s) => `KES. ${Number(s.averageCost).toFixed(2)}`,
       align: "right",
     },
   ];
@@ -140,7 +140,7 @@ export default function StockPage() {
           <div className="flex items-center justify-between mb-2">
             <p className="label-eyebrow">Valuation</p>
             <span className="text-sm font-mono text-ink-100">
-              $
+              KES.
               {totalValuation.toLocaleString(undefined, {
                 minimumFractionDigits: 2,
               })}
@@ -158,10 +158,11 @@ export default function StockPage() {
                 </div>
                 <div className="text-right">
                   <p className="text-ink-100 font-mono">
-                    ${Number(row.valuation).toFixed(2)}
+                    KES.{Number(row.valuation).toFixed(2)}
                   </p>
                   <p className="text-xs text-ink-500">
-                    {row.totalQuantity} × ${Number(row.averageCost).toFixed(2)}
+                    {row.totalQuantity} × KES.
+                    {Number(row.averageCost).toFixed(2)}
                   </p>
                 </div>
               </div>
