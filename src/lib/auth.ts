@@ -4,12 +4,14 @@ import type { AuthUser, ErpPermission, LoginResult } from "./types";
 export async function login(
   email: string,
   password: string,
+  productCode: string,
 ): Promise<AuthUser> {
   // POST http://localhost:5000/api/v1/auth/login
   // -> { success, message, data: { user, tokens: { accessToken, refreshToken, expiresIn } } }
   const result = await authApi.post<LoginResult>("/auth/login", {
     email,
     password,
+    productCode,
   });
   setToken(result.tokens.accessToken);
   setRefreshToken(result.tokens.refreshToken);

@@ -22,7 +22,11 @@ interface AuthContextValue {
   isCompanyAdmin: boolean;
   permissions: ErpPermission[] | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (
+    email: string,
+    password: string,
+    productCode: string,
+  ) => Promise<void>;
   logout: () => void;
 }
 
@@ -54,8 +58,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = useCallback(
-    async (email: string, password: string) => {
-      const account = await loginRequest(email, password);
+    async (email: string, password: string, productCode: string) => {
+      const account = await loginRequest(email, password, productCode);
       setUser(account);
       setPermissions(await fetchRolePermissions(account));
       router.push("/dashboard");
