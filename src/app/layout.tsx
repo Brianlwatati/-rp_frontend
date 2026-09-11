@@ -34,8 +34,12 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "IAS Console",
-  description: "Operations console for the ERP platform, backed by IAS identity & access.",
+  title: "ERP Console",
+  description:
+    "A connected ERP workspace for keeping business records accurate, organized, and audit-ready.",
+  icons: {
+    icon: "/logo.png",
+  },
 };
 
 export default function RootLayout({

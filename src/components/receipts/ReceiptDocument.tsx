@@ -82,15 +82,27 @@ export function ReceiptDocument({
       >
         <div className="flex items-start justify-between gap-4 pb-6 border-b border-base-600">
           <div>
-            <p className="font-display text-lg font-semibold">{company?.name ?? "Your Company"}</p>
-            {company?.code && <p className="text-xs text-ink-500 font-mono">{company.code}</p>}
-            {company?.email && <p className="text-xs text-ink-500">{company.email}</p>}
-            {company?.phone && <p className="text-xs text-ink-500">{company.phone}</p>}
+            <p className="font-display text-lg font-semibold">
+              {company?.name ?? "Your Company"}
+            </p>
+            {company?.code && (
+              <p className="text-xs text-ink-500 font-mono">{company.code}</p>
+            )}
+            {company?.email && (
+              <p className="text-xs text-ink-500">{company.email}</p>
+            )}
+            {company?.phone && (
+              <p className="text-xs text-ink-500">{company.phone}</p>
+            )}
           </div>
           <div className="text-right">
             <p className="label-eyebrow">{docType}</p>
             <p className="font-mono text-base text-ink-100 mt-1">{docNumber}</p>
-            <p className="text-xs text-ink-500 mt-1">{new Date(date).toLocaleDateString(undefined, { dateStyle: "medium" })}</p>
+            <p className="text-xs text-ink-500 mt-1">
+              {new Date(date).toLocaleDateString(undefined, {
+                dateStyle: "medium",
+              })}
+            </p>
             {status && (
               <div className="mt-2">
                 <Badge tone={statusTone}>{status}</Badge>
@@ -109,9 +121,15 @@ export function ReceiptDocument({
             <thead>
               <tr className="border-b border-base-600 text-left">
                 <th className="label-eyebrow font-normal py-2">Item</th>
-                <th className="label-eyebrow font-normal py-2 text-right">Qty</th>
-                <th className="label-eyebrow font-normal py-2 text-right">Unit price</th>
-                <th className="label-eyebrow font-normal py-2 text-right">Total</th>
+                <th className="label-eyebrow font-normal py-2 text-right">
+                  Qty
+                </th>
+                <th className="label-eyebrow font-normal py-2 text-right">
+                  Unit price
+                </th>
+                <th className="label-eyebrow font-normal py-2 text-right">
+                  Total
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -119,11 +137,21 @@ export function ReceiptDocument({
                 <tr key={i} className="border-b border-base-600/40">
                   <td className="py-2.5">
                     <p className="text-ink-100">{line.name}</p>
-                    {line.sku && <p className="text-xs text-ink-500 font-mono">{line.sku}</p>}
+                    {line.sku && (
+                      <p className="text-xs text-ink-500 font-mono">
+                        {line.sku}
+                      </p>
+                    )}
                   </td>
-                  <td className="py-2.5 text-right text-ink-300">{line.quantity}</td>
-                  <td className="py-2.5 text-right text-ink-300 font-mono">{money(line.unitPrice, currency)}</td>
-                  <td className="py-2.5 text-right text-ink-100 font-mono">{money(line.lineTotal, currency)}</td>
+                  <td className="py-2.5 text-right text-ink-300">
+                    {line.quantity}
+                  </td>
+                  <td className="py-2.5 text-right text-ink-300 font-mono">
+                    {money(line.unitPrice, currency)}
+                  </td>
+                  <td className="py-2.5 text-right text-ink-100 font-mono">
+                    {money(line.lineTotal, currency)}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -134,12 +162,16 @@ export function ReceiptDocument({
           <div className="mt-5 ml-auto max-w-xs space-y-1.5 text-sm">
             <div className="flex justify-between text-ink-300">
               <span>Subtotal</span>
-              <span className="font-mono">{money(totals.subtotal, currency)}</span>
+              <span className="font-mono">
+                {money(totals.subtotal, currency)}
+              </span>
             </div>
             {totals.discount !== undefined && Number(totals.discount) > 0 && (
               <div className="flex justify-between text-ink-300">
                 <span>Discount</span>
-                <span className="font-mono">-{money(totals.discount, currency)}</span>
+                <span className="font-mono">
+                  -{money(totals.discount, currency)}
+                </span>
               </div>
             )}
             {totals.tax !== undefined && (
@@ -155,13 +187,17 @@ export function ReceiptDocument({
             {totals.paid !== undefined && (
               <div className="flex justify-between text-signal-green">
                 <span>Paid</span>
-                <span className="font-mono">{money(totals.paid, currency)}</span>
+                <span className="font-mono">
+                  {money(totals.paid, currency)}
+                </span>
               </div>
             )}
             {totals.balance !== undefined && (
               <div className="flex justify-between text-ink-100 font-medium">
                 <span>Balance due</span>
-                <span className="font-mono">{money(totals.balance, currency)}</span>
+                <span className="font-mono">
+                  {money(totals.balance, currency)}
+                </span>
               </div>
             )}
           </div>
@@ -175,7 +211,7 @@ export function ReceiptDocument({
         )}
 
         <p className="mt-8 text-center text-xs text-ink-500">
-          {footer ?? "Generated by IAS Console"}
+          {footer ?? "Generated by ERP Console"}
         </p>
       </div>
     </div>

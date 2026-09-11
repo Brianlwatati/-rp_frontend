@@ -13,6 +13,7 @@ import {
   Settings,
   X,
 } from "lucide-react";
+import Image from "next/image";
 import { CompanyBadge } from "./CompanyBadge";
 import { NavItem } from "./NavItem";
 import { useAuth } from "@/context/AuthContext";
@@ -123,13 +124,17 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
 function Brand() {
   return (
     <div className="mb-4 flex items-center gap-2 px-1">
-      <div className="h-7 w-7 rounded-md bg-signal-cyan/15 border border-signal-cyan/40 flex items-center justify-center">
-        <span className="font-display font-bold text-signal-cyan text-xs">
-          IA
-        </span>
-      </div>
+      <Image
+        src="/logo.png"
+        alt="ERP Console"
+        width={28}
+        height={28}
+        className="h-7 w-7 rounded-md object-contain"
+        priority
+        unoptimized
+      />
       <span className="font-display text-sm font-semibold tracking-tight text-ink-100">
-        IAS Console
+        ERP Console
       </span>
     </div>
   );
@@ -167,13 +172,17 @@ export function Sidebar() {
       >
         <div className="mb-4 flex items-center justify-between px-1">
           <div className="flex items-center gap-2">
-            <div className="h-7 w-7 rounded-md bg-signal-cyan/15 border border-signal-cyan/40 flex items-center justify-center">
-              <span className="font-display font-bold text-signal-cyan text-xs">
-                IA
-              </span>
-            </div>
+            <Image
+              src="/logo.png"
+              alt="ERP Console"
+              width={28}
+              height={28}
+              className="h-7 w-7 rounded-md object-contain"
+              priority
+              unoptimized
+            />
             <span className="font-display text-sm font-semibold tracking-tight text-ink-100">
-              IAS Console
+              ERP Console
             </span>
           </div>
           <button

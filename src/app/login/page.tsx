@@ -49,31 +49,31 @@ function LoginForm() {
         <div className="relative flex items-center gap-2">
           <div className="h-8 w-8 rounded-md bg-signal-cyan/15 border border-signal-cyan/40 flex items-center justify-center">
             <span className="font-display font-bold text-signal-cyan text-sm">
-              IA
+              RP
             </span>
           </div>
           <span className="font-display font-semibold tracking-tight">
-            IAS Console
+            ERP Console
           </span>
         </div>
 
         <div className="relative flex flex-col gap-8 max-w-md">
           <div>
-            <p className="label-eyebrow mb-3">Identity &amp; Access Service</p>
+            <p className="label-eyebrow mb-3">Operations &amp; Records</p>
             <h1 className="font-display text-3xl font-semibold leading-tight text-ink-100">
-              One credential, every module downstream.
+              One record, every operation in view.
             </h1>
             <p className="mt-4 text-ink-300 text-sm leading-relaxed">
-              Signing in issues a scoped session token. Every module in this
-              console — inventory, orders, HR, access — reads the same
-              credential, so permissions stay consistent across the ERP.
+              Keep inventory, orders, HR, and access records in one connected
+              workspace, with every action organized by role and ready for
+              review.
             </p>
           </div>
           <AccessBadge />
         </div>
 
         <p className="relative text-xs text-ink-500 font-mono">
-          multi-tenant · role-scoped · audited
+          multi-tenant · role-scoped · audit-ready
         </p>
       </div>
 
@@ -84,11 +84,11 @@ function LoginForm() {
           <div className="mb-10 lg:hidden flex items-center gap-2">
             <div className="h-8 w-8 rounded-md bg-signal-cyan/15 border border-signal-cyan/40 flex items-center justify-center">
               <span className="font-display font-bold text-signal-cyan text-sm">
-                IA
+                RP
               </span>
             </div>
             <span className="font-display font-semibold tracking-tight">
-              IAS Console
+              ERP Console
             </span>
           </div>
 
