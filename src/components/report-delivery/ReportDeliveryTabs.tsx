@@ -4,20 +4,21 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const TABS = [
-  { href: "/sales/sales", label: "Sales orders" },
-  { href: "/sales/invoices", label: "Invoices" },
-  { href: "/sales/receivables", label: "Receivables" },
-  { href: "/sales/payments/new", label: "Record payment" },
+  { href: "/report-delivery", label: "Overview" },
+  { href: "/report-delivery/subscriptions", label: "Subscriptions" },
+  { href: "/report-delivery/new", label: "New subscription" },
 ];
 
-export function SalesTabs() {
+export function ReportDeliveryTabs() {
   const pathname = usePathname();
 
   return (
     <div className="flex items-center gap-1 border-b border-base-600/60 px-4 sm:px-6 overflow-x-auto">
       {TABS.map((tab) => {
         const active =
-          pathname === tab.href || pathname.startsWith(`${tab.href}/`);
+          pathname === tab.href ||
+          (tab.href !== "/report-delivery" &&
+            pathname.startsWith(`${tab.href}/`));
         return (
           <Link
             key={tab.href}
