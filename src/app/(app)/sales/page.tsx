@@ -1,156 +1,63 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Plus, CheckCircle2, Truck } from "lucide-react";
+import {
+  ArrowDownToLine,
+  Receipt,
+  ShoppingCart,
+  WalletCards,
+} from "lucide-react";
 import { Topbar } from "@/components/layout/Topbar";
-import { DataTable, Column } from "@/components/ui/DataTable";
-import { Badge } from "@/components/ui/Badge";
-import { api, describeApiError } from "@/lib/api";
-import type { SalesOrder, SalesOrderStatus } from "@/lib/types";
+import { SalesTabs } from "@/components/sales/SalesTabs";
 
-const STATUS_TONE: Record<
-  SalesOrderStatus,
-  "neutral" | "amber" | "green" | "red"
-> = {
-  DRAFT: "neutral",
-  CONFIRMED: "amber",
-  SHIPPED: "green",
-  CANCELLED: "red",
-};
-
-export default function SalesOrdersPage() {
-  const [orders, setOrders] = useState<SalesOrder[]>([]);
-  const [actionError, setActionError] = useState<string | null>(null);
-  const [busyId, setBusyId] = useState<number | null>(null);
-
-  function load() {
-    api
-      .get<SalesOrder[]>("/sales/orders")
-      .then(setOrders)
-      .catch(() => setOrders([]));
-  }
-
-  useEffect(load, []);
-
-  async function confirm(id: number) {
-    setActionError(null);
-    setBusyId(id);
-    try {
-      await api.post(`/sales/orders/${id}/confirm`);
-      await api.post(`/finance/invoices/from-order/${id}`);
-      load();
-    } catch (err) {
-      setActionError(
-        describeApiError(
-          err,
-          "Couldn't confirm this order and generate its invoice.",
-        ),
-      );
-    } finally {
-      setBusyId(null);
-    }
-  }
-
-  async function ship(id: number) {
-    setActionError(null);
-    setBusyId(id);
-    try {
-      await api.post(`/sales/orders/${id}/ship`);
-      load();
-    } catch (err) {
-      setActionError(describeApiError(err, "Couldn't ship this order."));
-    } finally {
-      setBusyId(null);
-    }
-  }
-
-  const columns: Column<SalesOrder>[] = [
+export default function SalesIndexPage() {
+  const tiles = [
     {
-      header: "Order",
-      accessor: (o) => (
-        <Link
-          href={`/sales/${o.id}`}
-          className="font-mono text-signal-cyan hover:text-signal-cyan/80"
-        >
-          {o.order_number}
-        </Link>
-      ),
+      href: "/finance/invoices",
+      label: "Invoices",
+      description: "Create and manage customer invoices from confirmed sales.",
+      icon: Receipt,
     },
     {
-      header: "Customer",
-      accessor: (o) => o.customerName ?? `Contact #${o.customer_id}`,
+      href: "/finance/receivables",
+      label: "Receivables",
+      description: "Track outstanding customer balances and incoming payments.",
+      icon: ArrowDownToLine,
     },
+
     {
-      header: "Warehouse",
-      accessor: (o) => o.warehouseName ?? `Warehouse #${o.warehouse_id}`,
-    },
-    {
-      header: "Status",
-      accessor: (o) => <Badge tone={STATUS_TONE[o.status]}>{o.status}</Badge>,
-    },
-    {
-      header: "Total",
-      accessor: (o) => `${o.currency} ${Number(o.total_amount).toFixed(2)}`,
-      align: "right",
-    },
-    {
-      header: "",
-      accessor: (o) => (
-        <div className="flex items-center justify-end gap-3">
-          {o.status === "DRAFT" && (
-            <button
-              disabled={busyId === o.id}
-              onClick={() => confirm(o.id)}
-              className="inline-flex items-center gap-1.5 text-signal-cyan hover:text-signal-cyan/80 text-xs disabled:opacity-50"
-            >
-              <CheckCircle2 size={13} />
-              Confirm
-            </button>
-          )}
-          {o.status === "CONFIRMED" && (
-            <button
-              disabled={busyId === o.id}
-              onClick={() => ship(o.id)}
-              className="inline-flex items-center gap-1.5 text-signal-green hover:text-signal-green/80 text-xs disabled:opacity-50"
-            >
-              <Truck size={13} />
-              Ship
-            </button>
-          )}
-        </div>
-      ),
-      align: "right",
-      width: "120px",
+      href: "/sales/payments/new",
+      label: "Record payment",
+      description: "Allocate a customer payment across one or more invoices.",
+      icon: WalletCards,
     },
   ];
 
   return (
     <>
       <Topbar
-        title="Sales orders"
-        description="Draft → confirmed → shipped, backed by reserved stock."
+        title="Sales"
+        description="Manage customer orders, invoices, and incoming payments."
       />
-      <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
-        {actionError && (
-          <p className="text-sm text-signal-red bg-signal-red/10 border border-signal-red/30 rounded-lg px-3 py-2">
-            {actionError}
-          </p>
-        )}
-        <div className="flex justify-end">
+      <SalesTabs />
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-5xl">
           <Link
-            href="/sales/new"
-            className="inline-flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium bg-signal-cyan text-base-950 hover:bg-signal-cyan/90 transition-colors"
+            href="/sales"
+            className="panel p-5 group hover:border-signal-cyan/60 transition-colors"
           >
-            <Plus size={15} />
-            New order
+            <div className="flex items-center justify-between">
+              <ShoppingCart size={20} className="text-signal-cyan" />
+              <span className="text-ink-500 group-hover:text-signal-cyan transition-colors">
+                →
+              </span>
+            </div>
+            <h2 className="mt-8 font-display text-lg font-semibold text-ink-100">
+              Sales orders
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-ink-500">
+              Create and manage customer orders from draft through shipment.
+            </p>
           </Link>
         </div>
-        <DataTable
-          columns={columns}
-          rows={orders}
-          rowKey={(o) => String(o.id)}
-        />
       </div>
     </>
   );

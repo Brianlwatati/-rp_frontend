@@ -33,7 +33,15 @@ const PRIMARY_NAV = [
   { href: "/finance", label: "Finance", icon: Receipt, name: "finance" },
 ];
 
-const FINANCE_HR_NAV = [{ href: "/hr", label: "HR", icon: Users2, name: "hr" }];
+const FINANCE_HR_NAV = [
+  { href: "/hr", label: "HR", icon: Users2, name: "hr" },
+  {
+    href: "/report-delivery",
+    label: "Report Delivery",
+    icon: Users2,
+    name: "reporting",
+  },
+];
 
 const ACCESS_NAV = [
   { href: "/roles", label: "Roles", icon: ShieldCheck, name: "access" },

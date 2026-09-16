@@ -5,6 +5,7 @@ import {
   Banknote,
   FileText,
   Receipt,
+  TrendingDown,
   WalletCards,
 } from "lucide-react";
 import { Topbar } from "@/components/layout/Topbar";
@@ -12,42 +13,48 @@ import { FinanceTabs } from "@/components/finance/FinanceTabs";
 
 export default function FinanceIndexPage() {
   const tiles = [
+    // {
+    //   href: "/finance/invoices",
+    //   label: "Invoices",
+    //   description: "Create and manage customer invoices from confirmed sales.",
+    //   icon: Receipt,
+    // },
+    // {
+    //   href: "/finance/receivables",
+    //   label: "Receivables",
+    //   description: "Track outstanding customer balances and incoming payments.",
+    //   icon: ArrowDownToLine,
+    // },
+    // {
+    //   href: "/finance/bills",
+    //   label: "Bills",
+    //   description: "Review supplier bills generated from received purchases.",
+    //   icon: FileText,
+    // },
+    // {
+    //   href: "/finance/payables",
+    //   label: "Payables",
+    //   description: "Monitor supplier balances and upcoming obligations.",
+    //   icon: ArrowUpFromLine,
+    // },
     {
-      href: "/finance/invoices",
-      label: "Invoices",
-      description: "Create and manage customer invoices from confirmed sales.",
-      icon: Receipt,
+      href: "/finance/expense",
+      label: "Expenses",
+      description: "Record and review operating expenses and payments.",
+      icon: TrendingDown,
     },
-    {
-      href: "/finance/receivables",
-      label: "Receivables",
-      description: "Track outstanding customer balances and incoming payments.",
-      icon: ArrowDownToLine,
-    },
-    {
-      href: "/finance/bills",
-      label: "Bills",
-      description: "Review supplier bills generated from received purchases.",
-      icon: FileText,
-    },
-    {
-      href: "/finance/payables",
-      label: "Payables",
-      description: "Monitor supplier balances and upcoming obligations.",
-      icon: ArrowUpFromLine,
-    },
-    {
-      href: "/finance/payments/new",
-      label: "Record payment",
-      description: "Allocate a customer payment across one or more invoices.",
-      icon: WalletCards,
-    },
-    {
-      href: "/finance/supplier-payments/new",
-      label: "Pay supplier",
-      description: "Record payments made against supplier bills.",
-      icon: Banknote,
-    },
+    // {
+    //   href: "/finance/payments/new",
+    //   label: "Record payment",
+    //   description: "Allocate a customer payment across one or more invoices.",
+    //   icon: WalletCards,
+    // },
+    // {
+    //   href: "/finance/supplier-payments/new",
+    //   label: "Pay supplier",
+    //   description: "Record payments made against supplier bills.",
+    //   icon: Banknote,
+    // },
   ];
 
   return (

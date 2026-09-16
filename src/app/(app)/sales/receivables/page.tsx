@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { CreditCard } from "lucide-react";
 import { Topbar } from "@/components/layout/Topbar";
-import { FinanceTabs } from "@/components/finance/FinanceTabs";
+import { SalesTabs } from "@/components/sales/SalesTabs";
 import { DataTable, Column } from "@/components/ui/DataTable";
 import { Badge } from "@/components/ui/Badge";
 import { api } from "@/lib/api";
@@ -73,7 +73,7 @@ export default function ReceivablesPage() {
         title="Receivables"
         description="Open and partially-paid invoices."
       />
-      <FinanceTabs />
+      <SalesTabs />
 
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">

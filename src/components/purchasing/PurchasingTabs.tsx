@@ -3,15 +3,21 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const TABS = [{ href: "/finance/expense", label: "Expenses" }];
+const TABS = [
+  { href: "/purchasing", label: "Purchase orders" },
+  { href: "/purchasing/bills", label: "Bills" },
+  { href: "/purchasing/payables", label: "Payables" },
+  { href: "/purchasing/supplier-payments/new", label: "Pay supplier" },
+];
 
-export function FinanceTabs() {
+export function PurchasingTabs() {
   const pathname = usePathname();
 
   return (
     <div className="flex items-center gap-1 border-b border-base-600/60 px-4 sm:px-6 overflow-x-auto">
       {TABS.map((tab) => {
-        const active = pathname.startsWith(tab.href);
+        const active =
+          pathname === tab.href || pathname.startsWith(`${tab.href}/`);
         return (
           <Link
             key={tab.href}

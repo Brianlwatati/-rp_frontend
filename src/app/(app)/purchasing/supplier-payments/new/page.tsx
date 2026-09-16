@@ -4,7 +4,7 @@ import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { CheckCircle2 } from "lucide-react";
 import { Topbar } from "@/components/layout/Topbar";
-import { FinanceTabs } from "@/components/finance/FinanceTabs";
+import { PurchasingTabs } from "@/components/purchasing/PurchasingTabs";
 import { Field, inputClass } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { api, describeApiError } from "@/lib/api";
@@ -86,7 +86,7 @@ export default function NewSupplierPaymentPage() {
         title="Pay supplier"
         description="Apply a payment against a supplier bill."
       />
-      <FinanceTabs />
+      <PurchasingTabs />
       <div className="flex-1 overflow-y-auto p-4 sm:p-6">
         <form onSubmit={onSubmit} className="max-w-2xl panel p-6 space-y-5">
           <div>

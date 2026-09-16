@@ -4,11 +4,11 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Plus, Receipt } from "lucide-react";
 import { Topbar } from "@/components/layout/Topbar";
-import { FinanceTabs } from "@/components/finance/FinanceTabs";
+import { SalesTabs } from "@/components/sales/SalesTabs";
 import { DataTable, Column } from "@/components/ui/DataTable";
 import { Badge } from "@/components/ui/Badge";
 import { api } from "@/lib/api";
-import type { InvoiceStatus, SupplierBill } from "@/lib/types";
+import type { Invoice, InvoiceStatus } from "@/lib/types";
 
 const STATUS_TONE: Record<
   InvoiceStatus,
@@ -20,35 +20,33 @@ const STATUS_TONE: Record<
   VOID: "red",
 };
 
-export default function BillsPage() {
+export default function InvoicesPage() {
   const [status, setStatus] = useState<InvoiceStatus | "">("");
-  const [bills, setBills] = useState<SupplierBill[]>([]);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
 
   useEffect(() => {
     api
-      .get<SupplierBill[]>(
-        `/finance/supplier-bills${status ? `?status=${status}` : ""}`,
-      )
-      .then(setBills)
-      .catch(() => setBills([]));
+      .get<Invoice[]>(`/finance/invoices${status ? `?status=${status}` : ""}`)
+      .then(setInvoices)
+      .catch(() => setInvoices([]));
   }, [status]);
 
-  const columns: Column<SupplierBill>[] = [
+  const columns: Column<Invoice>[] = [
     {
-      header: "Bill",
+      header: "Invoice",
       accessor: (i) => (
         <Link
-          href={`/finance/bills/${i.id}`}
+          href={`/finance/invoices/${i.id}`}
           className="inline-flex items-center gap-1.5 font-mono text-ink-100 hover:text-signal-cyan"
         >
           <Receipt size={13} className="text-ink-500" />
-          {i.bill_number}
+          {i.invoice_number}
         </Link>
       ),
     },
     {
-      header: "Supplier",
-      accessor: (i) => i.supplierName ?? `Contact #${i.supplier_id}`,
+      header: "Customer",
+      accessor: (i) => i.customerName ?? `Contact #${i.customer_id}`,
     },
     {
       header: "Status",
@@ -73,10 +71,10 @@ export default function BillsPage() {
   return (
     <>
       <Topbar
-        title="Bills"
-        description="Generated from Purchase orders — the receipt sent to a supplier."
+        title="Invoices"
+        description="Generated from sales orders — the receipt sent to a customer."
       />
-      <FinanceTabs />
+      <SalesTabs />
 
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -91,7 +89,7 @@ export default function BillsPage() {
             <option value="PAID">Paid</option>
           </select>
           <Link
-            href="/finance/bills/new"
+            href="/finance/invoices/new"
             className="inline-flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium bg-signal-cyan text-base-950 hover:bg-signal-cyan/90 transition-colors"
           >
             <Plus size={15} />
@@ -100,7 +98,7 @@ export default function BillsPage() {
         </div>
         <DataTable
           columns={columns}
-          rows={bills}
+          rows={invoices}
           rowKey={(i) => String(i.id)}
         />
       </div>

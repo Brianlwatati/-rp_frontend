@@ -4,7 +4,7 @@ import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { Trash2, CheckCircle2 } from "lucide-react";
 import { Topbar } from "@/components/layout/Topbar";
-import { FinanceTabs } from "@/components/finance/FinanceTabs";
+import { SalesTabs } from "@/components/sales/SalesTabs";
 import { Field, inputClass } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { api, describeApiError } from "@/lib/api";
@@ -98,7 +98,7 @@ export default function NewPaymentPage() {
         title="Record payment"
         description="Applies against one open invoice."
       />
-      <FinanceTabs />
+      <SalesTabs />
 
       <div className="flex-1 overflow-y-auto p-4 sm:p-6">
         <form onSubmit={onSubmit} className="max-w-2xl panel p-6 space-y-5">

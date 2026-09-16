@@ -429,6 +429,25 @@ export interface Payment {
   created_at: string;
 }
 
+export type ExpensePaymentMethod = "CASH" | "BANK" | "CREDIT";
+
+export interface Expense {
+  id: number;
+  category: string;
+  description: string;
+  amount: string | number;
+  expenseNumber?: string;
+  expenseDate?: string;
+  currency?: string;
+  paymentMethod?: ExpensePaymentMethod;
+  paymentAccountCode?: string;
+  supplierId?: number;
+  supplierName?: string;
+  reference?: string;
+  notes?: string;
+  createdAt?: string;
+}
+
 export type SupplierBillStatus = "OPEN" | "PARTIALLY_PAID" | "PAID" | "VOID";
 
 export interface SupplierBill {
@@ -631,6 +650,19 @@ export interface DashboardSummary {
   stockValue: string;
   openOrders: string;
   openPurchaseOrders: string;
+}
+
+export type SubscriptionChannel = "EMAIL" | "WHATSAPP";
+export type SubscriptionFrequency = "DAILY" | "WEEKLY";
+
+export interface ReportSubscription {
+  id: number;
+  channel: SubscriptionChannel;
+  frequency: SubscriptionFrequency;
+  timeOfDay: string;
+  recipient: string;
+  enabled: boolean;
+  dayOfWeek?: number;
 }
 
 export interface LowStockReportRow {
