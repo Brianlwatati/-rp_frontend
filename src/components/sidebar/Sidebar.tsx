@@ -5,13 +5,14 @@ import {
   ShieldCheck,
   Building2,
   Boxes,
-  ClipboardList,
-  Truck,
+  ShoppingCart,
   Contact,
   Receipt,
   Users2,
   Settings,
   X,
+  BarChart3,
+  Send,
 } from "lucide-react";
 import Image from "next/image";
 import { CompanyBadge } from "./CompanyBadge";
@@ -19,38 +20,89 @@ import { NavItem } from "./NavItem";
 import { useAuth } from "@/context/AuthContext";
 import { useSidebar } from "@/context/SidebarContext";
 
-const PRIMARY_NAV = [
+const WORKSPACE_NAV = [
   {
     href: "/dashboard",
     label: "Dashboard",
     icon: LayoutDashboard,
     name: "reporting",
   },
-  { href: "/inventory", label: "Inventory", icon: Boxes, name: "inventory" },
-  { href: "/sales", label: "Sales", icon: ClipboardList, name: "sales" },
-  { href: "/purchasing", label: "Purchasing", icon: Truck, name: "purchasing" },
-  { href: "/contacts", label: "Contacts", icon: Contact, name: "contacts" },
-  { href: "/finance", label: "Finance", icon: Receipt, name: "finance" },
 ];
 
-const FINANCE_HR_NAV = [
-  { href: "/hr", label: "HR", icon: Users2, name: "hr" },
+const BUSINESS_NAV = [
+  {
+    href: "/contacts",
+    label: "Contacts",
+    icon: Contact,
+    name: "contacts",
+  },
+  {
+    href: "/sales",
+    label: "Sales",
+    icon: ShoppingCart,
+    name: "sales",
+  },
+  {
+    href: "/purchasing",
+    label: "Purchasing",
+    icon: Receipt,
+    name: "purchasing",
+  },
+  {
+    href: "/inventory",
+    label: "Inventory",
+    icon: Boxes,
+    name: "inventory",
+  },
+  {
+    href: "/finance",
+    label: "Finance",
+    icon: Receipt,
+    name: "finance",
+  },
+];
+
+const INSIGHTS_NAV = [
+  {
+    href: "/reports",
+    label: "Reports",
+    icon: BarChart3,
+    name: "reporting",
+  },
   {
     href: "/report-delivery",
     label: "Report Delivery",
-    icon: Users2,
+    icon: Send,
     name: "reporting",
   },
 ];
 
-const ACCESS_NAV = [
-  { href: "/roles", label: "Roles", icon: ShieldCheck, name: "access" },
-  { href: "/branches", label: "Branches", icon: Building2, name: "access" },
+const ADMINISTRATION_NAV = [
+  {
+    href: "/hr",
+    label: "HR",
+    icon: Users2,
+    name: "hr",
+  },
+  {
+    href: "/roles",
+    label: "Roles & Permissions",
+    icon: ShieldCheck,
+    name: "access",
+  },
+  {
+    href: "/branches",
+    label: "Branches",
+    icon: Building2,
+    name: "access",
+  },
 ];
 
 function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
   const { user, isCompanyAdmin, permissions } = useAuth();
+
   const initials = user?.email ? user.email.slice(0, 2).toUpperCase() : "OP";
+
   const hasModuleAccess = (module: string) =>
     isCompanyAdmin ||
     Boolean(
@@ -60,40 +112,69 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
       ),
     );
 
-  const primaryNav = PRIMARY_NAV.filter((item) => hasModuleAccess(item.name));
-  const financeHrNav = FINANCE_HR_NAV.filter((item) =>
+  const workspaceNav = WORKSPACE_NAV.filter((item) =>
     hasModuleAccess(item.name),
   );
-  const accessNav = ACCESS_NAV.filter((item) => hasModuleAccess(item.name));
+
+  const businessNav = BUSINESS_NAV.filter((item) => hasModuleAccess(item.name));
+
+  const insightsNav = INSIGHTS_NAV.filter((item) => hasModuleAccess(item.name));
+
+  const administrationNav = ADMINISTRATION_NAV.filter((item) =>
+    hasModuleAccess(item.name),
+  );
 
   return (
     <>
       <CompanyBadge />
 
       <nav className="mt-6 flex-1 space-y-6 overflow-y-auto">
-        <div>
-          <p className="label-eyebrow px-3 mb-2">Operations</p>
-          <div className="space-y-0.5">
-            {primaryNav.map((item) => (
-              <NavItem key={item.href} {...item} onNavigate={onNavigate} />
-            ))}
-          </div>
-        </div>
-        {financeHrNav.length > 0 && (
+        {/* Workspace */}
+        {workspaceNav.length > 0 && (
           <div>
-            <p className="label-eyebrow px-3 mb-2"> HR</p>
+            <p className="label-eyebrow px-3 mb-2">Workspace</p>
+
             <div className="space-y-0.5">
-              {financeHrNav.map((item) => (
+              {workspaceNav.map((item) => (
                 <NavItem key={item.href} {...item} onNavigate={onNavigate} />
               ))}
             </div>
           </div>
         )}
-        {accessNav.length > 0 && (
+
+        {/* Business */}
+        {businessNav.length > 0 && (
           <div>
-            <p className="label-eyebrow px-3 mb-2">Access</p>
+            <p className="label-eyebrow px-3 mb-2">Business</p>
+
             <div className="space-y-0.5">
-              {accessNav.map((item) => (
+              {businessNav.map((item) => (
+                <NavItem key={item.href} {...item} onNavigate={onNavigate} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Insights */}
+        {insightsNav.length > 0 && (
+          <div>
+            <p className="label-eyebrow px-3 mb-2">Insights</p>
+
+            <div className="space-y-0.5">
+              {insightsNav.map((item) => (
+                <NavItem key={item.href} {...item} onNavigate={onNavigate} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Administration */}
+        {administrationNav.length > 0 && (
+          <div>
+            <p className="label-eyebrow px-3 mb-2">Administration</p>
+
+            <div className="space-y-0.5">
+              {administrationNav.map((item) => (
                 <NavItem key={item.href} {...item} onNavigate={onNavigate} />
               ))}
             </div>
@@ -101,6 +182,7 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
         )}
       </nav>
 
+      {/* Bottom section */}
       <div className="border-t border-base-600/60 pt-3 mt-3">
         <NavItem
           href="/settings"
@@ -115,10 +197,12 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
               {initials}
             </span>
           </div>
+
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm text-ink-100">
               {user?.email ?? "Signed-in operator"}
             </p>
+
             <p className="truncate text-[11px] text-ink-500 font-mono">
               {user?.roleName ?? "Operator"}
             </p>
@@ -141,6 +225,7 @@ function Brand() {
         priority
         unoptimized
       />
+
       <span className="font-display text-sm font-semibold tracking-tight text-ink-100">
         ERP Console
       </span>
@@ -189,10 +274,12 @@ export function Sidebar() {
               priority
               unoptimized
             />
+
             <span className="font-display text-sm font-semibold tracking-tight text-ink-100">
               ERP Console
             </span>
           </div>
+
           <button
             onClick={closeMobile}
             aria-label="Close menu"
@@ -201,6 +288,7 @@ export function Sidebar() {
             <X size={18} />
           </button>
         </div>
+
         <SidebarBody onNavigate={closeMobile} />
       </aside>
     </>

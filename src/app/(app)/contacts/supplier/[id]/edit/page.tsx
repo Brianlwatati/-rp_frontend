@@ -19,13 +19,12 @@ const EMPTY_FORM = {
   creditLimit: "",
 };
 
-export default function EditContactPage() {
+const routeBase = "/contacts/supplier";
+
+export default function EditSupplierPage() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
 
-  const [contactType, setContactType] = useState<Contact["contactType"] | null>(
-    null,
-  );
   const [status, setStatus] = useState<Contact["status"] | null>(null);
   const [form, setForm] = useState(EMPTY_FORM);
   const [loading, setLoading] = useState(true);
@@ -34,17 +33,14 @@ export default function EditContactPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // There's no GET /contacts/:id — the list endpoint is the only read
-    // path, so it's fetched and filtered client-side.
     api
-      .get<Contact[]>("/contacts")
+      .get<Contact[]>("/contacts?type=SUPPLIER")
       .then((contacts) => {
         const contact = contacts.find((c) => String(c.id) === params.id);
         if (!contact) {
-          setLoadError("Contact not found.");
+          setLoadError("Supplier not found.");
           return;
         }
-        setContactType(contact.contactType);
         setStatus(contact.status);
         setForm({
           name: contact.name,
@@ -56,7 +52,7 @@ export default function EditContactPage() {
         });
       })
       .catch((err) =>
-        setLoadError(describeApiError(err, "Couldn't load this contact.")),
+        setLoadError(describeApiError(err, "Couldn't load this supplier.")),
       )
       .finally(() => setLoading(false));
   }, [params.id]);
@@ -73,7 +69,6 @@ export default function EditContactPage() {
     setError(null);
     setSubmitting(true);
     try {
-      // PATCH /contacts/:id — contactType and status aren't accepted here.
       await api.patch<Contact>(`/contacts/${params.id}`, {
         name: form.name,
         phone: form.phone || undefined,
@@ -82,7 +77,7 @@ export default function EditContactPage() {
         taxId: form.taxId || undefined,
         creditLimit: form.creditLimit ? Number(form.creditLimit) : undefined,
       });
-      router.push("/contacts");
+      router.push(routeBase);
     } catch (err) {
       setError(describeApiError(err, "Couldn't save these changes."));
     } finally {
@@ -92,18 +87,11 @@ export default function EditContactPage() {
 
   return (
     <>
-      <Topbar
-        title="Edit contact"
-        description={
-          contactType
-            ? `${contactType} · Contact #${params.id}`
-            : `Contact #${params.id}`
-        }
-      />
+      <Topbar title="Edit supplier" description={`Supplier #${params.id}`} />
       <div className="flex-1 overflow-y-auto p-4 sm:p-6">
         {loading ? (
-          <p className="text-sm text-ink-500">Loading contact…</p>
-        ) : loadError && !contactType ? (
+          <p className="text-sm text-ink-500">Loading supplier…</p>
+        ) : loadError ? (
           <p className="text-sm text-signal-red bg-signal-red/10 border border-signal-red/30 rounded-lg px-3 py-2 max-w-xl">
             {loadError}
           </p>
@@ -185,7 +173,7 @@ export default function EditContactPage() {
                 {submitting ? "Saving…" : "Save changes"}
               </Button>
               <Link
-                href="/contacts"
+                href={routeBase}
                 className="inline-flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium bg-base-700 text-ink-100 border border-base-600 hover:bg-base-700/70 transition-colors"
               >
                 Cancel
