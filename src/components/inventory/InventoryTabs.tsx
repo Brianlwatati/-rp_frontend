@@ -13,6 +13,7 @@ const TABS = [
 
 export function InventoryTabs() {
   const pathname = usePathname();
+  const isOverviewPage = pathname === "/inventory";
 
   return (
     <>
@@ -38,15 +39,17 @@ export function InventoryTabs() {
         })}
       </div>
 
-      <div className="flex lg:hidden flex-wrap items-center justify-between gap-3 px-4 sm:px-6 border-b border-base-600/60 pt-3 pb-2">
-        <Link
-          href="/inventory"
-          className="inline-flex items-center gap-1.5 text-sm text-ink-500 hover:text-ink-100 transition-colors"
-        >
-          <ArrowLeft size={14} />
-          Back to inventory
-        </Link>
-      </div>
+      {!isOverviewPage && (
+        <div className="flex lg:hidden flex-wrap items-center justify-between gap-3 px-4 sm:px-6 border-b border-base-600/60 pt-3 pb-2">
+          <Link
+            href="/inventory"
+            className="inline-flex items-center gap-1.5 text-sm text-ink-500 hover:text-ink-100 transition-colors"
+          >
+            <ArrowLeft size={14} />
+            Back to inventory
+          </Link>
+        </div>
+      )}
     </>
   );
 }

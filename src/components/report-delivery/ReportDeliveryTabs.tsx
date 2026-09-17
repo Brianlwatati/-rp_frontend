@@ -13,6 +13,7 @@ const TABS = [
 
 export function ReportDeliveryTabs() {
   const pathname = usePathname();
+  const isOverviewPage = pathname === "/report-delivery";
 
   return (
     <>
@@ -38,15 +39,17 @@ export function ReportDeliveryTabs() {
         })}
       </div>
 
-      <div className="flex lg:hidden flex-wrap items-center justify-between gap-3 px-4 sm:px-6 border-b border-base-600/60 pt-3 pb-2">
-        <Link
-          href="/report-delivery"
-          className="inline-flex items-center gap-1.5 text-sm text-ink-500 hover:text-ink-100 transition-colors"
-        >
-          <ArrowLeft size={14} />
-          Back to report delivery
-        </Link>
-      </div>
+      {!isOverviewPage && (
+        <div className="flex lg:hidden flex-wrap items-center justify-between gap-3 px-4 sm:px-6 border-b border-base-600/60 pt-3 pb-2">
+          <Link
+            href="/report-delivery"
+            className="inline-flex items-center gap-1.5 text-sm text-ink-500 hover:text-ink-100 transition-colors"
+          >
+            <ArrowLeft size={14} />
+            Back to report delivery
+          </Link>
+        </div>
+      )}
     </>
   );
 }
