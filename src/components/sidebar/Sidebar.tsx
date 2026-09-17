@@ -31,10 +31,10 @@ const WORKSPACE_NAV = [
 
 const BUSINESS_NAV = [
   {
-    href: "/contacts",
-    label: "Contacts",
-    icon: Contact,
-    name: "contacts",
+    href: "/inventory",
+    label: "Inventory",
+    icon: Boxes,
+    name: "inventory",
   },
   {
     href: "/sales",
@@ -49,10 +49,10 @@ const BUSINESS_NAV = [
     name: "purchasing",
   },
   {
-    href: "/inventory",
-    label: "Inventory",
-    icon: Boxes,
-    name: "inventory",
+    href: "/contacts",
+    label: "Contacts",
+    icon: Contact,
+    name: "contacts",
   },
   // {
   //   href: "/finance",

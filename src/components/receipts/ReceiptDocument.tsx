@@ -136,7 +136,9 @@ export function ReceiptDocument({
               {lines.map((line, i) => (
                 <tr key={i} className="border-b border-base-600/40">
                   <td className="py-2.5">
-                    <p className="text-ink-100">{line.name}</p>
+                    <p className="text-ink-100" style={{ whiteSpace: "pre-line" }}>
+                      {line.name}
+                    </p>
                     {line.sku && (
                       <p className="text-xs text-ink-500 font-mono">
                         {line.sku}

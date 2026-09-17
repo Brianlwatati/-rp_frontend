@@ -91,7 +91,7 @@ export default function ReportSubscriptionsPage() {
         )}
         <div className="flex justify-end">
           <Link
-            href="/report-delivery/new"
+            href="/report-delivery/subscription/new"
             className="inline-flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium bg-signal-cyan text-base-950 hover:bg-signal-cyan/90 transition-colors"
           >
             <BellPlus size={15} />

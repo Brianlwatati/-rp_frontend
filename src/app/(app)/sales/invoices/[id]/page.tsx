@@ -52,14 +52,14 @@ export default function InvoiceReceiptPage() {
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3 no-print">
           <Link
-            href="/finance/invoices"
+            href="/sales/invoices"
             className="inline-flex items-center gap-1.5 text-sm text-ink-500 hover:text-ink-100 transition-colors"
           >
             <ArrowLeft size={14} />
             Back to invoices
           </Link>
           {invoice && balance > 0 && (
-            <Link href="/finance/payments/new">
+            <Link href="/sales/payments/new">
               <Button variant="secondary">
                 <CreditCard size={15} />
                 Record payment

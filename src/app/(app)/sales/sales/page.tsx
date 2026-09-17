@@ -71,7 +71,7 @@ export default function SalesOrdersPage() {
       header: "Order",
       accessor: (o) => (
         <Link
-          href={`/sales/${o.id}`}
+          href={`/sales/sales/${o.id}`}
           className="font-mono text-signal-cyan hover:text-signal-cyan/80"
         >
           {o.order_number}
@@ -141,7 +141,7 @@ export default function SalesOrdersPage() {
         )}
         <div className="flex justify-end">
           <Link
-            href="/sales/new"
+            href="/sales/sales/new"
             className="inline-flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium bg-signal-cyan text-base-950 hover:bg-signal-cyan/90 transition-colors"
           >
             <Plus size={15} />

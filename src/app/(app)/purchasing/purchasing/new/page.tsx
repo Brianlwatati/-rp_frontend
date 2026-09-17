@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Plus, Trash2 } from "lucide-react";
 import { Topbar } from "@/components/layout/Topbar";
 import { Field, inputClass } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
@@ -70,7 +70,7 @@ export default function NewPurchaseOrderPage() {
           unitCost: Number(row.unitCost || 0),
         })),
       });
-      router.push("/purchasing");
+      router.push("/purchasing/purchasing");
     } catch (err) {
       setError(
         describeApiError(
@@ -89,7 +89,16 @@ export default function NewPurchaseOrderPage() {
         title="New purchase order"
         description="Orders start as DRAFT — approve, then receive goods."
       />
-      <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <Link
+            href="/purchasing/purchasing"
+            className="inline-flex items-center gap-1.5 text-sm text-ink-500 hover:text-ink-100 transition-colors"
+          >
+            <ArrowLeft size={14} />
+            Back to purchasing
+          </Link>
+        </div>
         <form onSubmit={onSubmit} className="max-w-2xl panel p-6 space-y-5">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <Field label="Supplier" required>

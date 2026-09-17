@@ -262,7 +262,7 @@ export default function NewPaymentPage() {
                 </span>
               </p>
               <Link
-                href="/finance/receivables"
+                href="/sales/receivables"
                 className="text-signal-cyan hover:text-signal-cyan/80 text-xs"
               >
                 View updated receivables →
@@ -275,7 +275,7 @@ export default function NewPaymentPage() {
               {submitting ? "Recording…" : "Record payment"}
             </Button>
             <Link
-              href="/finance/receivables"
+              href="/sales/receivables"
               className="inline-flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium bg-base-700 text-ink-100 border border-base-600 hover:bg-base-700/70 transition-colors"
             >
               Cancel

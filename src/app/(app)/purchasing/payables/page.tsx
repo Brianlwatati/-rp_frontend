@@ -77,7 +77,7 @@ export default function PayablesPage() {
             </span>
           </p>
           <Link
-            href="/finance/supplier-payments/new"
+            href="/purchasing/supplier-payments/new"
             className="inline-flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium bg-signal-cyan text-base-950 hover:bg-signal-cyan/90 transition-colors"
           >
             <CreditCard size={15} /> Pay supplier

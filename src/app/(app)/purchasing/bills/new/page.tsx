@@ -39,7 +39,7 @@ export default function NewSupplierBillPage() {
       const bill = await api.post<SupplierBill>(
         `/finance/supplier-bills/from-order/${orderId}`,
       );
-      router.push(`/finance/bills/${bill.id}`);
+      router.push(`/purchasing/bills/${bill.id}`);
     } catch (err) {
       setError(describeApiError(err, "Could not create this supplier bill."));
     } finally {
@@ -93,7 +93,7 @@ export default function NewSupplierBillPage() {
                 </span>
               </p>
               <Link
-                href="/finance/payables"
+                href="/purchasing/payables"
                 className="text-signal-cyan text-xs"
               >
                 View updated payables
@@ -105,7 +105,7 @@ export default function NewSupplierBillPage() {
               {submitting ? "Creating..." : "Generate supplier bill"}
             </Button>
             <Link
-              href="/finance/payables"
+              href="/purchasing/payables"
               className="inline-flex items-center rounded-lg px-3.5 py-2 text-sm font-medium bg-base-700 text-ink-100 border border-base-600"
             >
               Cancel

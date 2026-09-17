@@ -665,6 +665,24 @@ export interface ReportSubscription {
   dayOfWeek?: number;
 }
 
+export interface ErpReportSnapshotData {
+  salesValue: number;
+  ordersCount: number;
+  outstandingInvoices: number;
+  stockValue: number;
+  lowStockCount: number;
+}
+
+export interface ErpReportSnapshot {
+  id: number;
+  iasCompanyId: number;
+  periodType: "DAILY" | "WEEKLY";
+  periodStart: string;
+  periodEnd: string;
+  data: ErpReportSnapshotData;
+  generatedAt: string;
+}
+
 export interface LowStockReportRow {
   id: number;
   sku: string;

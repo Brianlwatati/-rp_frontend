@@ -114,7 +114,7 @@ export default function PurchaseOrderDetailPage() {
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3 no-print">
           <button
-            onClick={() => router.push("/purchasing")}
+            onClick={() => router.push("/purchasing/purchasing")}
             className="inline-flex items-center gap-1.5 text-sm text-ink-500 hover:text-ink-100 transition-colors"
           >
             <ArrowLeft size={14} />
@@ -134,24 +134,6 @@ export default function PurchaseOrderDetailPage() {
                   <PackageCheck size={15} />
                   Receive remaining stock
                 </Button>
-              )}
-              {order.status === "RECEIVED" && (
-                <>
-                  <Button
-                    variant="secondary"
-                    disabled={busy || billCreated}
-                    onClick={createBill}
-                  >
-                    <FileText size={15} />
-                    {billCreated ? "Bill created" : "Create supplier bill"}
-                  </Button>
-                  <Link
-                    href={`/finance/supplier-credit-notes/new?orderId=${order.id}`}
-                    className="inline-flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium bg-base-700 text-ink-100 border border-base-600 hover:border-signal-cyan transition-colors"
-                  >
-                    <FilePlus2 size={15} /> Credit note
-                  </Link>
-                </>
               )}
             </div>
           )}
@@ -180,7 +162,7 @@ export default function PurchaseOrderDetailPage() {
             partyName={order.supplierName ?? `Contact #${order.supplier_id}`}
             currency={order.currency}
             lines={order.items.map<ReceiptLine>((item) => ({
-              name: `${item.product_name} (${item.received_quantity}/${item.quantity} received)`,
+              name: `${item.product_name}\n(${item.received_quantity}/${item.quantity} received)`,
               sku: item.product_sku,
               quantity: item.quantity,
               unitPrice: item.unit_cost,

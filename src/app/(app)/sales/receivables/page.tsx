@@ -40,7 +40,7 @@ export default function ReceivablesPage() {
       header: "Invoice",
       accessor: (r) => (
         <Link
-          href={`/finance/invoices/${r.id}`}
+          href={`/sales/invoices/${r.id}`}
           className="font-mono text-ink-100 hover:text-signal-cyan"
         >
           {r.invoice_number}
@@ -84,7 +84,7 @@ export default function ReceivablesPage() {
             </span>
           </p>
           <Link
-            href="/finance/payments/new"
+            href="/sales/payments/new"
             className="inline-flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium bg-signal-cyan text-base-950 hover:bg-signal-cyan/90 transition-colors"
           >
             <CreditCard size={15} />

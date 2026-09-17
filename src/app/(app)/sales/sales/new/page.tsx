@@ -72,7 +72,7 @@ export default function NewSalesOrderPage() {
           unitPrice: row.unitPrice ? Number(row.unitPrice) : undefined,
         })),
       });
-      router.push("/sales");
+      router.push("/sales/sales");
     } catch (err) {
       setError(
         describeApiError(
@@ -94,7 +94,7 @@ export default function NewSalesOrderPage() {
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <Link
-            href="/sales"
+            href="/sales/sales"
             className="inline-flex items-center gap-1.5 text-sm text-ink-500 hover:text-ink-100 transition-colors"
           >
             <ArrowLeft size={14} />

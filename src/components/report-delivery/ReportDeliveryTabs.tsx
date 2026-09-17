@@ -6,9 +6,10 @@ import { usePathname } from "next/navigation";
 
 const TABS = [
   { href: "/report-delivery", label: "Overview" },
-  { href: "/report-delivery/subscriptions", label: "Subscriptions" },
-  { href: "/report-delivery/usage", label: "Usage" },
-  { href: "/report-delivery/settings", label: "Settings" },
+  { href: "/report-delivery/subscription", label: "Subscriptions" },
+  { href: "/report-delivery/snapshot", label: "Snapshots" },
+  // { href: "/report-delivery/usage", label: "Usage" },
+  // { href: "/report-delivery/settings", label: "Settings" },
 ];
 
 export function ReportDeliveryTabs() {

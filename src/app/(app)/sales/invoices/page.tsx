@@ -36,7 +36,7 @@ export default function InvoicesPage() {
       header: "Invoice",
       accessor: (i) => (
         <Link
-          href={`/finance/invoices/${i.id}`}
+          href={`/sales/invoices/${i.id}`}
           className="inline-flex items-center gap-1.5 font-mono text-ink-100 hover:text-signal-cyan"
         >
           <Receipt size={13} className="text-ink-500" />
@@ -89,7 +89,7 @@ export default function InvoicesPage() {
             <option value="PAID">Paid</option>
           </select>
           <Link
-            href="/finance/invoices/new"
+            href="/sales/invoices/new"
             className="inline-flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium bg-signal-cyan text-base-950 hover:bg-signal-cyan/90 transition-colors"
           >
             <Plus size={15} />

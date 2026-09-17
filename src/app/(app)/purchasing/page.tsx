@@ -5,7 +5,7 @@ import { PurchasingTabs } from "@/components/purchasing/PurchasingTabs";
 
 const tiles = [
   {
-    href: "/purchasing",
+    href: "/purchasing/purchasing",
     label: "Purchase orders",
     description:
       "Create and manage supplier orders from draft through receipt.",

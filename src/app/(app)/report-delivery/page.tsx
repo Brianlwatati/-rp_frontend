@@ -12,6 +12,12 @@ export default function ReportsIndexPage() {
       icon: Receipt,
     },
     {
+      href: "/report-delivery/snapshot",
+      label: "Snapshots",
+      description: "View historical snapshots of your reports.",
+      icon: Receipt,
+    },
+    {
       href: "/report-delivery/usage",
       label: "Usage",
       description: "View usage statistics for your report delivery.",
