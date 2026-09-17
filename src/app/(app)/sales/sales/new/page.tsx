@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, ArrowLeft } from "lucide-react";
 import { Topbar } from "@/components/layout/Topbar";
 import { Field, inputClass } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
@@ -91,7 +91,17 @@ export default function NewSalesOrderPage() {
         title="New sales order"
         description="Orders start as DRAFT — confirm to reserve stock."
       />
-      <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <Link
+            href="/sales"
+            className="inline-flex items-center gap-1.5 text-sm text-ink-500 hover:text-ink-100 transition-colors"
+          >
+            <ArrowLeft size={14} />
+            Back to sales
+          </Link>
+        </div>
+
         <form onSubmit={onSubmit} className="max-w-2xl panel p-6 space-y-5">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <Field label="Customer" required>

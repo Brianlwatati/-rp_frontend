@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { Topbar } from "@/components/layout/Topbar";
 import { SalesTabs } from "@/components/sales/SalesTabs";
 import { Field, inputClass } from "@/components/ui/FormField";
@@ -54,7 +55,17 @@ export default function NewInvoicePage() {
       />
       <SalesTabs />
 
-      <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <Link
+            href="/sales"
+            className="inline-flex items-center gap-1.5 text-sm text-ink-500 hover:text-ink-100 transition-colors"
+          >
+            <ArrowLeft size={14} />
+            Back to sales
+          </Link>
+        </div>
+
         <form onSubmit={onSubmit} className="max-w-xl panel p-6 space-y-5">
           <Field
             label="Sales order"

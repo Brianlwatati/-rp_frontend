@@ -8,6 +8,7 @@ import { DataTable, Column } from "@/components/ui/DataTable";
 import { Badge } from "@/components/ui/Badge";
 import { api } from "@/lib/api";
 import type { Contact } from "@/lib/types";
+import { ContactTabs } from "@/components/contact/ContactsTab";
 
 const TYPE_TONE = {
   CUSTOMER: "green",
@@ -70,6 +71,8 @@ export default function CustomerContactsPage() {
         title="Customers"
         description="Customer records and contact details."
       />
+
+      <ContactTabs />
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
         <div className="flex justify-end">
           <Link

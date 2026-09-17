@@ -8,6 +8,7 @@ import { Field, inputClass } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { api, describeApiError } from "@/lib/api";
 import type { Contact } from "@/lib/types";
+import { ContactTabs } from "@/components/contact/ContactsTab";
 
 const routeBase = "/contacts/customer";
 
@@ -62,6 +63,8 @@ export default function NewCustomerPage() {
   return (
     <>
       <Topbar title="New customer" description="Add a new customer record." />
+      <ContactTabs />
+
       <div className="flex-1 overflow-y-auto p-4 sm:p-6">
         <form onSubmit={onSubmit} className="max-w-xl panel p-6 space-y-5">
           <Field label="Name" required>

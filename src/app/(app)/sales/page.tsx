@@ -44,7 +44,7 @@ export default function SalesIndexPage() {
         title="Sales"
         description="Manage customer orders, invoices, and incoming payments."
       />
-      {/* <SalesTabs /> */}
+      <SalesTabs />
       <div className="flex-1 overflow-y-auto p-4 sm:p-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-5xl">
           {tiles.map(({ href, label, description, icon: Icon }) => (

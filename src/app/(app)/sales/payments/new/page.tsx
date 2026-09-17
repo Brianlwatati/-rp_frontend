@@ -100,7 +100,7 @@ export default function NewPaymentPage() {
       />
       <SalesTabs />
 
-      <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
         <form onSubmit={onSubmit} className="max-w-2xl panel p-6 space-y-5">
           <div>
             <p className="text-xs font-medium text-ink-300 mb-2">

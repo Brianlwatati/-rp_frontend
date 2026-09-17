@@ -4,24 +4,16 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const TABS = [
-  { href: "/report-delivery", label: "Overview" },
-  { href: "/report-delivery/subscriptions", label: "Subscriptions" },
-  { href: "/report-delivery/usage", label: "Usage" },
-  { href: "/report-delivery/settings", label: "Settings" },
-];
+const TABS = [{ href: "/branches/branches", label: "Branches" }];
 
-export function ReportDeliveryTabs() {
+export function BranchesTab() {
   const pathname = usePathname();
 
   return (
     <>
       <div className="hidden lg:flex items-center gap-1 border-b border-base-600/60 px-4 sm:px-6 overflow-x-auto">
         {TABS.map((tab) => {
-          const active =
-            pathname === tab.href ||
-            (tab.href !== "/report-delivery" &&
-              pathname.startsWith(`${tab.href}/`));
+          const active = pathname.startsWith(tab.href);
           return (
             <Link
               key={tab.href}
@@ -40,11 +32,11 @@ export function ReportDeliveryTabs() {
 
       <div className="flex lg:hidden flex-wrap items-center justify-between gap-3 px-4 sm:px-6 border-b border-base-600/60 pt-3 pb-2">
         <Link
-          href="/report-delivery"
+          href="/branches"
           className="inline-flex items-center gap-1.5 text-sm text-ink-500 hover:text-ink-100 transition-colors"
         >
           <ArrowLeft size={14} />
-          Back to report delivery
+          Back to branches
         </Link>
       </div>
     </>

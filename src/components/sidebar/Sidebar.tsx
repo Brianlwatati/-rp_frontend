@@ -54,12 +54,12 @@ const BUSINESS_NAV = [
     icon: Boxes,
     name: "inventory",
   },
-  {
-    href: "/finance",
-    label: "Finance",
-    icon: Receipt,
-    name: "finance",
-  },
+  // {
+  //   href: "/finance",
+  //   label: "Finance",
+  //   icon: Receipt,
+  //   name: "finance",
+  // },
 ];
 
 const INSIGHTS_NAV = [

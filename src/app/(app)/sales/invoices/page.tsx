@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Plus, Receipt } from "lucide-react";
+import { Plus, Receipt, ArrowLeft } from "lucide-react";
 import { Topbar } from "@/components/layout/Topbar";
 import { SalesTabs } from "@/components/sales/SalesTabs";
 import { DataTable, Column } from "@/components/ui/DataTable";

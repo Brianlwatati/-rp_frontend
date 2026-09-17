@@ -1,110 +1,54 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import Link from "next/link";
-import { BellPlus } from "lucide-react";
+import { Receipt } from "lucide-react";
 import { Topbar } from "@/components/layout/Topbar";
-import { DataTable, Column } from "@/components/ui/DataTable";
-import { Badge } from "@/components/ui/Badge";
-import { api, describeApiError } from "@/lib/api";
-import type { ReportSubscription } from "@/lib/types";
+import { ReportDeliveryTabs } from "@/components/report-delivery/ReportDeliveryTabs";
 
-const CHANNEL_TONE = {
-  EMAIL: "cyan",
-  WHATSAPP: "green",
-} as const;
-
-const DAY_NAMES = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-];
-
-function formatSchedule(subscription: ReportSubscription) {
-  const time = subscription.timeOfDay.slice(0, 5);
-  if (subscription.frequency === "DAILY") return `Daily at ${time}`;
-  const day = DAY_NAMES[subscription.dayOfWeek ?? -1] ?? "Selected day";
-  return `${day} at ${time}`;
-}
-
-export default function ReportDeliveryPage() {
-  const [subscriptions, setSubscriptions] = useState<ReportSubscription[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    api
-      .get<ReportSubscription[]>("/report-delivery/subscriptions")
-      .then(setSubscriptions)
-      .catch((err) => {
-        setError(describeApiError(err, "Could not load report subscriptions."));
-      })
-      .finally(() => setLoading(false));
-  }, []);
-
-  const columns: Column<ReportSubscription>[] = [
+export default function ReportsIndexPage() {
+  const tiles = [
     {
-      header: "Channel",
-      accessor: (subscription) => (
-        <Badge tone={CHANNEL_TONE[subscription.channel]}>
-          {subscription.channel}
-        </Badge>
-      ),
+      href: "/report-delivery/subscription",
+      label: "Subscriptions",
+      description: "Manage your report delivery subscriptions.",
+      icon: Receipt,
     },
     {
-      header: "Recipient",
-      accessor: (subscription) => (
-        <span className="text-ink-100">{subscription.recipient}</span>
-      ),
-    },
-    {
-      header: "Schedule",
-      accessor: (subscription) => formatSchedule(subscription),
-    },
-    {
-      header: "Status",
-      accessor: (subscription) => (
-        <Badge tone={subscription.enabled ? "green" : "neutral"}>
-          {subscription.enabled ? "Enabled" : "Disabled"}
-        </Badge>
-      ),
+      href: "/report-delivery/usage",
+      label: "Usage",
+      description: "View usage statistics for your report delivery.",
+      icon: Receipt,
     },
   ];
 
   return (
     <>
       <Topbar
-        title="Report delivery"
-        description="Schedule reports to arrive by email or WhatsApp."
+        title="Report Delivery"
+        description="Manage and review your report delivery settings."
       />
-      <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
-        <div className="flex justify-end">
-          <Link
-            href="/report-delivery/new"
-            className="inline-flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium bg-signal-cyan text-base-950 hover:bg-signal-cyan/90 transition-colors"
-          >
-            <BellPlus size={15} />
-            New subscription
-          </Link>
+      <ReportDeliveryTabs />
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-5xl">
+          {tiles.map(({ href, label, description, icon: Icon }) => (
+            <Link
+              key={href}
+              href={href}
+              className="panel p-5 group hover:border-signal-cyan/60 transition-colors"
+            >
+              <div className="flex items-center justify-between">
+                <Icon size={20} className="text-signal-cyan" />
+                <span className="text-ink-500 group-hover:text-signal-cyan transition-colors">
+                  →
+                </span>
+              </div>
+              <h2 className="mt-8 font-display text-lg font-semibold text-ink-100">
+                {label}
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-ink-500">
+                {description}
+              </p>
+            </Link>
+          ))}
         </div>
-
-        {error && (
-          <p className="text-sm text-signal-red bg-signal-red/10 border border-signal-red/30 rounded-lg px-3 py-2">
-            {error}
-          </p>
-        )}
-
-        <DataTable
-          columns={columns}
-          rows={subscriptions}
-          rowKey={(subscription) => String(subscription.id)}
-          emptyLabel="No report subscriptions yet."
-          loading={loading}
-        />
       </div>
     </>
   );
