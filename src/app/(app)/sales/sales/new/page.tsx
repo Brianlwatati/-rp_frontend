@@ -9,7 +9,7 @@ import { Field, inputClass } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { api, describeApiError } from "@/lib/api";
 import { useInventoryLookups } from "@/lib/inventoryLookups";
-import type { Contact, SalesOrder } from "@/lib/types";
+import type { Contact, SalesOrder, StockLevelWithDetails } from "@/lib/types";
 
 interface ItemRow {
   productId: string;
@@ -23,6 +23,7 @@ export default function NewSalesOrderPage() {
   const router = useRouter();
   const { products, warehouses } = useInventoryLookups();
   const [customers, setCustomers] = useState<Contact[]>([]);
+  const [stockLevels, setStockLevels] = useState<StockLevelWithDetails[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -38,7 +39,44 @@ export default function NewSalesOrderPage() {
       .get<Contact[]>("/contacts?type=CUSTOMER")
       .then(setCustomers)
       .catch(() => setCustomers([]));
+    api
+      .get<StockLevelWithDetails[]>("/inventory/stock")
+      .then(setStockLevels)
+      .catch(() => setStockLevels([]));
   }, []);
+
+  function availableStock(productId: string) {
+    return Number(
+      stockLevels.find(
+        (stock) =>
+          String(stock.productId) === productId &&
+          String(stock.warehouseId) === warehouseId,
+      )?.availableQuantity ?? 0,
+    );
+  }
+
+  const stockedProducts = products.filter(
+    (product) => warehouseId && availableStock(String(product.id)) > 0,
+  );
+  const customerName = customers.find(
+    (customer) => String(customer.id) === customerId,
+  )?.name;
+  const warehouseName = warehouses.find(
+    (warehouse) => String(warehouse.id) === warehouseId,
+  )?.label;
+  const itemDescription = items
+    .filter((item) => item.productId)
+    .map((item) => {
+      const productName = products.find(
+        (product) => String(product.id) === item.productId,
+      )?.label;
+      return `${productName ?? `product #${item.productId}`} (${item.quantity || 0} units)`;
+    })
+    .join(", ");
+  const generatedDescription =
+    itemDescription && customerName && warehouseName
+      ? `Sale of ${itemDescription} to ${customerName} from ${warehouseName}.`
+      : "";
 
   function updateItem(index: number, patch: Partial<ItemRow>) {
     setItems((rows) =>
@@ -59,13 +97,33 @@ export default function NewSalesOrderPage() {
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
+
+    const requestedByProduct = items.reduce<Record<string, number>>(
+      (totals, row) => {
+        totals[row.productId] =
+          (totals[row.productId] ?? 0) + Number(row.quantity);
+        return totals;
+      },
+      {},
+    );
+    const overStockProduct = Object.entries(requestedByProduct).find(
+      ([productId, quantity]) => quantity > availableStock(productId),
+    );
+    if (overStockProduct) {
+      const [productId, quantity] = overStockProduct;
+      setError(
+        `Requested quantity (${quantity}) exceeds available stock (${availableStock(productId)}).`,
+      );
+      return;
+    }
+
     setSubmitting(true);
     try {
       await api.post<SalesOrder>("/sales/orders", {
         customerId: Number(customerId),
         warehouseId: Number(warehouseId),
         orderNumber: orderNumber || undefined,
-        notes: notes || undefined,
+        notes: notes || generatedDescription || undefined,
         items: items.map((row) => ({
           productId: Number(row.productId),
           quantity: Number(row.quantity),
@@ -130,7 +188,17 @@ export default function NewSalesOrderPage() {
               <select
                 required
                 value={warehouseId}
-                onChange={(e) => setWarehouseId(e.target.value)}
+                onChange={(e) => {
+                  setWarehouseId(e.target.value);
+                  setItems((rows) =>
+                    rows.map((row) => ({
+                      ...row,
+                      productId: "",
+                      quantity: "1",
+                      unitPrice: "",
+                    })),
+                  );
+                }}
                 className={inputClass}
               >
                 <option value="" disabled>
@@ -183,21 +251,31 @@ export default function NewSalesOrderPage() {
                       className={inputClass}
                     >
                       <option value="" disabled>
-                        Select a product…
+                        {warehouseId
+                          ? "Select a product…"
+                          : "Select a warehouse first…"}
                       </option>
-                      {products.map((p) => (
+                      {stockedProducts.map((p) => (
                         <option key={p.id} value={p.id}>
-                          {p.label}
+                          {p.label} · {availableStock(String(p.id))} available
                         </option>
                       ))}
                     </select>
                   </div>
+                  {row.productId && (
+                    <span className="text-xs text-ink-500 sm:w-28 sm:pb-3">
+                      {availableStock(row.productId)} available
+                    </span>
+                  )}
                   <input
                     required
                     type="number"
                     min="0.01"
                     step="any"
                     value={row.quantity}
+                    max={
+                      row.productId ? availableStock(row.productId) : undefined
+                    }
                     onChange={(e) =>
                       updateItem(i, { quantity: e.target.value })
                     }
@@ -236,9 +314,12 @@ export default function NewSalesOrderPage() {
             </button>
           </div>
 
-          <Field label="Notes">
+          <Field
+            label="Description"
+            hint="Generated from the selected product, quantity, customer, and warehouse."
+          >
             <textarea
-              value={notes}
+              value={notes || generatedDescription}
               onChange={(e) => setNotes(e.target.value)}
               rows={2}
               className={inputClass}

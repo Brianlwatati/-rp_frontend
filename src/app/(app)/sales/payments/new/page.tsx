@@ -17,6 +17,13 @@ interface AllocationRow {
 
 const EMPTY_ROW: AllocationRow = { invoiceId: "", amount: "" };
 
+function todayAsInputValue() {
+  const today = new Date();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+  return `${today.getFullYear()}-${month}-${day}`;
+}
+
 export default function NewPaymentPage() {
   const [customers, setCustomers] = useState<Contact[]>([]);
   const [receivables, setReceivables] = useState<Receivable[]>([]);
@@ -26,7 +33,7 @@ export default function NewPaymentPage() {
 
   const [customerId, setCustomerId] = useState("");
   const [amount, setAmount] = useState("");
-  const [paymentDate, setPaymentDate] = useState("");
+  const [paymentDate, setPaymentDate] = useState(todayAsInputValue);
   const [paymentReference, setPaymentReference] = useState("");
   const [method, setMethod] = useState("CASH");
   const [notes, setNotes] = useState("");
@@ -59,6 +66,22 @@ export default function NewPaymentPage() {
     );
   }
 
+  const generatedDescription = allocations
+    .filter((allocation) => allocation.invoiceId)
+    .map((allocation) => {
+      const receivable = receivables.find(
+        (item) => String(item.id) === allocation.invoiceId,
+      );
+      const customerName =
+        receivable?.customerName ??
+        customers.find((customer) => customer.id === receivable?.customer_id)
+          ?.name ??
+        (receivable ? `customer #${receivable.customer_id}` : "customer");
+      const paidAmount = Number(allocation.amount || 0).toFixed(2);
+      return `Payment received for invoice ${receivable?.invoice_number ?? `#${allocation.invoiceId}`} of $${paidAmount} from ${customerName} on ${paymentDate}.`;
+    })
+    .join(" ");
+
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
@@ -71,7 +94,7 @@ export default function NewPaymentPage() {
         paymentDate: paymentDate || undefined,
         paymentReference: paymentReference || undefined,
         method: method || undefined,
-        notes: notes || undefined,
+        notes: notes || generatedDescription || undefined,
         allocations: allocations
           .filter((a) => a.invoiceId)
           .map((a) => ({
@@ -230,9 +253,12 @@ export default function NewPaymentPage() {
             </Field>
           </div>
 
-          <Field label="Notes">
+          <Field
+            label="Description"
+            hint="Generated from the selected invoice, customer, amount, and payment date."
+          >
             <textarea
-              value={notes}
+              value={notes || generatedDescription}
               onChange={(e) => setNotes(e.target.value)}
               rows={2}
               className={inputClass}
