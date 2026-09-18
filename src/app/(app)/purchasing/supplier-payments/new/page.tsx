@@ -16,12 +16,19 @@ interface AllocationRow {
 }
 const EMPTY_ROW: AllocationRow = { billId: "", amount: "" };
 
+function todayAsInputValue() {
+  const today = new Date();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+  return `${today.getFullYear()}-${month}-${day}`;
+}
+
 export default function NewSupplierPaymentPage() {
   const [suppliers, setSuppliers] = useState<Contact[]>([]);
   const [bills, setBills] = useState<SupplierBill[]>([]);
   const [supplierId, setSupplierId] = useState("");
   const [amount, setAmount] = useState("");
-  const [paymentDate, setPaymentDate] = useState("");
+  const [paymentDate, setPaymentDate] = useState(todayAsInputValue);
   const [reference, setReference] = useState("");
   const [method, setMethod] = useState("CASH");
   const [notes, setNotes] = useState("");
@@ -47,6 +54,19 @@ export default function NewSupplierPaymentPage() {
     );
   }
 
+  const generatedDescription = rows
+    .filter((row) => row.billId)
+    .map((row) => {
+      const bill = bills.find((item) => String(item.id) === row.billId);
+      const supplierName =
+        bill?.supplierName ??
+        suppliers.find((supplier) => supplier.id === bill?.supplier_id)?.name ??
+        (bill ? `supplier #${bill.supplier_id}` : "supplier");
+      const paidAmount = Number(row.amount || 0).toFixed(2);
+      return `Payment of bill ${bill?.bill_number ?? `#${row.billId}`} for ${bill?.currency ?? ""} ${paidAmount} to ${supplierName} on ${paymentDate}.`;
+    })
+    .join(" ");
+
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
     setError(null);
@@ -61,7 +81,7 @@ export default function NewSupplierPaymentPage() {
           paymentDate: paymentDate || undefined,
           paymentReference: reference || undefined,
           method,
-          notes: notes || undefined,
+          notes: notes || generatedDescription || undefined,
           allocations: rows
             .filter((row) => row.billId)
             .map((row) => ({
@@ -205,9 +225,12 @@ export default function NewSupplierPaymentPage() {
             </Field>
           </div>
 
-          <Field label="Notes">
+          <Field
+            label="Description"
+            hint="Generated from the selected bill, supplier, amount, and payment date."
+          >
             <textarea
-              value={notes}
+              value={notes || generatedDescription}
               onChange={(e) => setNotes(e.target.value)}
               rows={2}
               className={inputClass}

@@ -32,6 +32,26 @@ export default function NewPurchaseOrderPage() {
   const [notes, setNotes] = useState("");
   const [items, setItems] = useState<ItemRow[]>([{ ...EMPTY_ROW }]);
 
+  const supplierName = suppliers.find(
+    (supplier) => String(supplier.id) === supplierId,
+  )?.name;
+  const warehouseName = warehouses.find(
+    (warehouse) => String(warehouse.id) === warehouseId,
+  )?.label;
+  const itemDescription = items
+    .filter((item) => item.productId)
+    .map((item) => {
+      const productName = products.find(
+        (product) => String(product.id) === item.productId,
+      )?.label;
+      return `${productName ?? `product #${item.productId}`} (${item.quantity || 0} units)`;
+    })
+    .join(", ");
+  const generatedDescription =
+    itemDescription && supplierName && warehouseName
+      ? `Purchase of ${itemDescription} from ${supplierName} to be received in ${warehouseName}.`
+      : "";
+
   useEffect(() => {
     // Only SUPPLIER/BOTH contacts are valid PO suppliers server-side.
     api
@@ -63,7 +83,7 @@ export default function NewPurchaseOrderPage() {
         supplierId: Number(supplierId),
         warehouseId: Number(warehouseId),
         poNumber: poNumber || undefined,
-        notes: notes || undefined,
+        notes: notes || generatedDescription || undefined,
         items: items.map((row) => ({
           productId: Number(row.productId),
           quantity: Number(row.quantity),
@@ -235,9 +255,12 @@ export default function NewPurchaseOrderPage() {
             </button>
           </div>
 
-          <Field label="Notes">
+          <Field
+            label="Description"
+            hint="Generated from the selected product, quantity, supplier, and warehouse."
+          >
             <textarea
-              value={notes}
+              value={notes || generatedDescription}
               onChange={(e) => setNotes(e.target.value)}
               rows={2}
               className={inputClass}
